@@ -93,7 +93,7 @@ function moreWalls(num) {
 }
 
 // camera.position.y += 20
-camera.position.set(0, 10, 0);
+camera.position.set(0, 10, -15);
 camera.rotation.y = Math.PI;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -143,32 +143,32 @@ const changeXYPosition = (obj, shape) => {
   obj.changeX = obj.x - obj.lastXPosition;
   obj.changeY = obj.y - obj.lastYPosition;
 
-  shape.position.x += obj.changeX * 0.2;
+  shape.position.x -= obj.changeX * 0.2;
   shape.position.y += -(obj.changeY * 0.2);
   obj.lastXPosition = obj.x;
   obj.lastYPosition = obj.y;
 };
 
-const changeHeadPosition = (obj, shape, body) => {
-  obj.changeX = obj.x - body.lastXPosition;
-  // obj.changeY = obj.y - body.lastYPosition;
+// const changeHeadPosition = (obj, shape, body) => {
+//   obj.changeX = obj.x - body.lastXPosition;
+//   // obj.changeY = obj.y - body.lastYPosition;
 
-  shape.position.x += obj.changeX * 0.2;
-  // shape.position.y += -(obj.changeY * 0.2);
+//   shape.position.x += obj.changeX * 0.2;
+//   // shape.position.y += -(obj.changeY * 0.2);
 
-  obj.lastXPosition = obj.x;
-  obj.lastYPosition = obj.y;
-};
+//   obj.lastXPosition = obj.x;
+//   obj.lastYPosition = obj.y;
+// };
 
 let counter = 0;
-const render = function() {
-  requestAnimationFrame(render);
+const init = function() {
+  requestAnimationFrame(init);
   // if (counter === 0) {
   //   console.log(floor)
   //   counter++
   // }
-  // camera.position.z += cameraSpeed;
-  // head.position.z += cameraSpeed;
+  camera.position.z += cameraSpeed;
+  body.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
   if (camera.position.z > startFloor - 800) {
@@ -238,16 +238,18 @@ let bodyParts = {
 
 // }
 
-let geometry = new THREE.SphereGeometry(4);
+// let geometry = new THREE.SphereGeometry(4);
 let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
-let head = new THREE.Mesh(geometry, material);
-// head.position.y += 10;
-head.position.z += 65;
+// let head = new THREE.Mesh(geometry, material);
+
+// head.position.z += 65;
 
 let bodyGeometry = new THREE.BoxGeometry(4, 8);
 let body = new THREE.Mesh(bodyGeometry, material);
 body.position.y += 10;
-body.position.z += 65;
+
+// body.position.z += 65;
+// head.position.y = body.position.y
 
 //left arm test
 let bones = [];
@@ -266,7 +268,8 @@ leftWrist.position.z += 65;
 
 const leftArm = new THREE.Skeleton(bones);
 
-scene.add(light, head, body, createHemisphereLight());
+scene.add(light, body, createHemisphereLight());
+// body.rotation.x = Math.PI
 
 poseNet.on('pose', function(results) {
   let poses = results;
@@ -275,17 +278,17 @@ poseNet.on('pose', function(results) {
 
   // console.log(bodyParts.nose.x && bodyParts.nose.y);
 
-  // if (bodyParts.nose.x && bodyParts.nose.y) {
-  //   console.log(bodyParts.nose, 'NOSE PARTS');
-  //   changeHeadPosition(bodyParts.nose, head, bodyParts.body);
+  if (bodyParts.nose.x && bodyParts.nose.y) {
+    // console.log(bodyParts.nose, 'NOSE PARTS');
+    changeXYPosition(bodyParts.body, body);
 
-  //   render(bodyParts.nose, head);
-  // }
+    // render(bodyParts.nose, head);
+  }
 
   if (bodyParts.body.x && bodyParts.body.y) {
     changeXYPosition(bodyParts.body, body);
     // changeXYPosition(bodyParts.nose, head);
-    render(bodyParts.body, body);
+    // render(bodyParts.body, body);
   }
 });
 
@@ -339,5 +342,5 @@ document
 function playGame() {
   // event.preventDefault()
   document.getElementById('menu').style.display = 'none';
-  render();
+  init();
 }
