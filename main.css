@@ -1,16 +1,8 @@
 body {
-  display: flex;
-  flex-direction: column;
-  align-content: flex-start;
-  background: black;
+  margin: 0;
+  height: 100vh;
 }
-#video {
-  margin: auto;
-}
-video {
-  filter: drop-shadow(0 0 0.75rem white);
-}
+
 canvas {
-  margin: auto;
-  filter: drop-shadow(0 0 0.75rem white);
+  display: block;
 }
