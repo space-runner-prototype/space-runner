@@ -12,8 +12,8 @@ export default class SingleHole {
       (wallDimension - holeWidth) / 2 + holeLocation,
       wallDimension
     );
-    let col1Material = new THREE.MeshStandardMaterial({
-      color: 0x883322,
+    let col1Material = new THREE.MeshToonMaterial({
+      color: getRandomColor(),
       wireframe: false,
       side: THREE.DoubleSide,
     });
@@ -24,9 +24,9 @@ export default class SingleHole {
       (wallDimension - holeWidth) / 2 - holeLocation,
       wallDimension
     );
-    let col2Material = new THREE.MeshStandardMaterial({
-      color: 0x883322,
-      wireframe: true,
+    let col2Material = new THREE.MeshToonMaterial({
+      color: getRandomColor(),
+      wireframe: false,
       side: THREE.DoubleSide,
     });
     this.col2 = new THREE.Mesh(col2Geometry, col2Material);
@@ -36,9 +36,9 @@ export default class SingleHole {
       holeWidth,
       wallDimension - holeHeight
     );
-    let col3Material = new THREE.MeshStandardMaterial({
-      color: 0x883322,
-      wireframe: true,
+    let col3Material = new THREE.MeshToonMaterial({
+      color: getRandomColor(),
+      wireframe: false,
       side: THREE.DoubleSide,
     });
     this.col3 = new THREE.Mesh(col3Geometry, col3Material);
@@ -83,5 +83,17 @@ export default class SingleHole {
     }
   }
 }
+
+function getRandomColor() {
+  let letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  if (color !== '#ffffff') {
+  return color
+  }
+}
+
 
 // export default MiddleHole

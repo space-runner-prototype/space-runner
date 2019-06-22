@@ -17,31 +17,31 @@ let walls = []
 let newWalls = []
 let cameraSpeed = 1
 
-// let video = document.createElement('video');
-// let vidDiv = document.getElementById('video');
+let video = document.createElement('video');
+let vidDiv = document.getElementById('video');
 
-// video.setAttribute('width', 200);
-// video.setAttribute('height', 200);
-// video.autoplay = true;
+video.setAttribute('width', 200);
+video.setAttribute('height', 200);
+video.autoplay = true;
 // vidDiv.appendChild(video);
 
 // get the users webcam stream to render in the video
-// navigator.mediaDevices
-//   .getUserMedia({ video: true, audio: false })
-//   .then(function(stream) {
-//     video.srcObject = stream;
-//     // video.hiddend();
-//   })
-//   .catch(function(err) {
-//     console.log('An error occurred! ' + err);
-//   });
+navigator.mediaDevices
+  .getUserMedia({ video: true, audio: false })
+  .then(function(stream) {
+    video.srcObject = stream;
+    // video.hiddend();
+  })
+  .catch(function(err) {
+    console.log('An error occurred! ' + err);
+  });
 
-// let options = {
-//   flipHorizontal: true,
-//   minConfidence: .5,
-// };
+let options = {
+  flipHorizontal: true,
+  minConfidence: .5,
+};
 
-// let poseNet = ml5.poseNet(video, options, modelReady);
+let poseNet = ml5.poseNet(video, options, modelReady);
 
 //three.js code
 const scene = new THREE.Scene();
@@ -105,18 +105,19 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
 
-// let geometry = new THREE.BoxGeometry(8, 8);
+let geometry = new THREE.BoxGeometry(8, 8);
 
-// let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
+let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
 
-// let box = new THREE.Mesh(geometry, material);
+let box = new THREE.Mesh(geometry, material);
 // let halfMouthObj = new THREE.Mesh( halfMouth, material );
 
-// let light = new THREE.PointLight(0xffff00);
-// light.position.set(-10, 0, 10);
+let light = new THREE.PointLight(0xffff00);
+light.position.set(-10, 0, 10);
 
-// function createHemisphereLight() {
-//   return new THREE.HemisphereLight(0x303f9f, 0x000000, 1);
+function createHemisphereLight() {
+  return new THREE.HemisphereLight(0x303f9f, 0x000000, 1);
+}
 
 // creates floor planes
 
@@ -144,25 +145,31 @@ createFloor()
 // puts the floor along the x-axis
 
 
-// box.position.y += 10;
+box.position.y += 10;
 
-// scene.add(light, box, createHemisphereLight());
+scene.add(light, box, createHemisphereLight());
 
 // Render Loop
-// let lastXPosition = 100;
-// let lastYPosition = 100;
-// let changeX = 1;
-// let changeY = 1;
+let lastXPosition = 100;
+let lastYPosition = 100;
+let changeX = 1;
+let changeY = 1;
 
-// const changeYXPosition = (faceObj, shape) => {
-//   changeX = faceObj.x - lastXPosition;
-//   changeY = faceObj.y - lastYPosition;
+const changeYXPosition = (faceObj, shape) => {
+  changeX = faceObj.x - lastXPosition;
+  changeY = faceObj.y - lastYPosition;
 
-//   shape.position.x += changeX * 0.2;
-//   shape.position.y += -(changeY * 0.2);
-//   // camera.lastXPosition = faceObj.x;
-//   lastYPosition = faceObj.y;
-// };
+  shape.position.x += changeX * 0.2;
+  shape.position.y += -(changeY * 0.2);
+  // camera.lastXPosition = faceObj.x;
+  lastYPosition = faceObj.y;
+};
+
+// let light = new THREE.DirectionalLight(0xffffff, 5.0)
+
+// light.position.set(10, 10, 10)
+
+// scene.add(light)
 
 let counter = 0
 const render = function() {
@@ -172,6 +179,7 @@ const render = function() {
   //   counter++
   // }
   camera.position.z += cameraSpeed;
+  box.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
 
@@ -224,29 +232,29 @@ const render = function() {
 };
 render()
 
-// let nose = {};
-// let rightEye = {};
-// let leftEye = {};
+let nose = {};
+let rightEye = {};
+let leftEye = {};
 
-// poseNet.on('pose', function(results) {
-//   let poses = results;
-//   loopThroughPoses(poses, nose, rightEye, leftEye);
-//   let estimatedNose = {
-//     x: nose.x,
-//     y: nose.y,
-//   };
+poseNet.on('pose', function(results) {
+  let poses = results;
+  loopThroughPoses(poses, nose, rightEye, leftEye);
+  let estimatedNose = {
+    x: nose.x,
+    y: nose.y,
+  };
 
-//   camera.position.x = nose.x;
-//   camera.position.y = nose.y;
+  camera.position.x = nose.x;
+  camera.position.y = nose.y;
 
-//   if (estimatedNose.x && estimatedNose.y) {
-//     render(estimatedNose, box);
-//   }
-// });
+  if (estimatedNose.x && estimatedNose.y) {
+    render(estimatedNose, box);
+  }
+});
 
-// function modelReady() {
-//   console.log('model Loaded');
-// }
+function modelReady() {
+  console.log('model Loaded');
+}
 
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
