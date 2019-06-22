@@ -6,6 +6,7 @@ import SingleHole from './Walls/singleHole';
 //new compile?
 
 let keyboard = {};
+// let target = []
 
 //Manage walls
 // const singleHole = new SingleHole();
@@ -41,7 +42,7 @@ let options = {
   minConfidence: .5,
 };
 
-let poseNet = ml5.poseNet(video, options, modelReady);
+// let poseNet = ml5.poseNet(video, options, modelReady);
 
 //three.js code
 const scene = new THREE.Scene();
@@ -57,6 +58,48 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
+// let loader = new THREE.FontLoader()
+
+// let startButton = loader.load( './fonts/droid_sans_bold.typeface.json', function ( font ) {
+
+// 	var geometry = new THREE.TextGeometry( 'START', {
+// 		font: font,
+// 		size: 80,
+// 		height: 5,
+// 		curveSegments: 12,
+// 		bevelEnabled: true,
+// 		bevelThickness: 10,
+// 		bevelSize: 8,
+// 		bevelOffset: 0,
+// 		bevelSegments: 5
+// 	} );
+// } );
+
+
+// loading screen
+// let loadingScreen = {
+//   scene: new THREE.Scene(),
+//   camera: new THREE.PerspectiveCamera(75,
+//     window.innerWidth / window.innerHeight,
+//     0.1,
+//     1000),
+//   startButton: new THREE.Mesh(
+//     new THREE.BoxGeometry(0.5, 0.5, 0.5),
+//     new THREE.MeshBasicMaterial({color: 0x444fff})
+//   )
+// }
+// loadingScreen.startButton.playGame = false
+
+// console.log("START BUTTON", loadingScreen.startButton)
+// let PLAY_GAME = false
+
+
+// loadingScreen.startButton.position.set(0, 0, 5)
+// loadingScreen.camera.lookAt(loadingScreen.startButton.position)
+// loadingScreen.scene.add(loadingScreen.startButton)
+
+// target.push(loadingScreen.startButton)
+// console.log(target)
 
 function createWalls  (num) {
   let distance = 50
@@ -90,7 +133,7 @@ function moreWalls ( num ) {
       console.log(piece.position.z, 'POSITION Z')
       });
   }
-  cameraSpeed += .2
+  // cameraSpeed += .2
 }
 
 // camera.position.y += 20
@@ -173,14 +216,23 @@ const changeYXPosition = (faceObj, shape) => {
 
 let counter = 0
 const render = function() {
+  
+  // if (loadingScreen.startButton.playGame === false) {
+  //   requestAnimationFrame(render)
+
+  //   renderer.render(loadingScreen.scene, loadingScreen.camera)
+  //   return
+  // }
+  // else {
   requestAnimationFrame( render )
   // if (counter === 0) {
   //   console.log(floor)
   //   counter++
   // }
-  camera.position.z += cameraSpeed;
+  // camera.position.z += cameraSpeed;
   box.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
+
 
 
   if (camera.position.z > startFloor - 800){  
@@ -229,32 +281,33 @@ const render = function() {
   // walls[0].checkCollision(box);
 
   renderer.render(scene, camera);
+
 };
-render()
+// render()
 
 let nose = {};
 let rightEye = {};
 let leftEye = {};
 
-poseNet.on('pose', function(results) {
-  let poses = results;
-  loopThroughPoses(poses, nose, rightEye, leftEye);
-  let estimatedNose = {
-    x: nose.x,
-    y: nose.y,
-  };
+// poseNet.on('pose', function(results) {
+//   let poses = results;
+//   loopThroughPoses(poses, nose, rightEye, leftEye);
+//   let estimatedNose = {
+//     x: nose.x,
+//     y: nose.y,
+//   };
 
-  camera.position.x = nose.x;
-  camera.position.y = nose.y;
+//   camera.position.x = nose.x;
+//   camera.position.y = nose.y;
 
-  if (estimatedNose.x && estimatedNose.y) {
-    render(estimatedNose, box);
-  }
-});
+//   if (estimatedNose.x && estimatedNose.y) {
+//     render(estimatedNose, box);
+//   }
+// });
 
-function modelReady() {
-  console.log('model Loaded');
-}
+// function modelReady() {
+//   console.log('model Loaded');
+// }
 
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -288,6 +341,41 @@ function keyDown(event) {
 function keyUp(event) {
   keyboard[event.keyCode] = false;
 }
+// console.log(loadingScreen.startButton)
+
+
+// console.log(raycaster)
+let mouse = new THREE.Vector2()
+let raycaster = new THREE.Raycaster()
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+
+document.getElementById("play_button").addEventListener('click', function (event) {
+  event.preventDefault();
+  playGame();
+});
+// window.addEventListener('click', playGame)
+// console.log(window)
+
+
+
+function playGame() {
+  // event.preventDefault()
+  document.getElementById("menu").style.display = "none";
+  render()
+  // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  
+  // raycaster.setFromCamera(mouse, camera)
+  // // console.log(raycaster, 'raycaster')
+  // // console.log(scene.children , 'SCENE.CHILDREN')
+  // let intersects = raycaster.intersectObjects(target)
+  // console.log(intersects)
+  // for (let i = 0; i < intersects.length; i++) {
+    
+  //   intersects[i].object.material.color.set(0xff0000)
+  // }
+  // // console.log(intersects)
+  
+}
