@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import * as ml5 from 'ml5';
 import * as THREE from 'three';
-import loopThroughPoses from './threeJs/nose';
+import updatePoses from './threeJs/updatePoses';
 import SingleHole from './Walls/singleHole';
 //new compile?
 
@@ -63,11 +63,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
 
-let geometry = new THREE.BoxGeometry(8, 8);
-
-let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
-
-let box = new THREE.Mesh(geometry, material);
 // let halfMouthObj = new THREE.Mesh( halfMouth, material );
 
 let light = new THREE.PointLight(0xffff00);
@@ -81,37 +76,42 @@ function createHemisphereLight() {
 let floor = new THREE.Mesh(
   new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 100, 100),
   // wireframe tests for plane geometry which side is the right side
-  new THREE.MeshBasicMaterial({ color: 0x883333, wireframe: true })
+  new THREE.MeshBasicMaterial({ color: 0x38761d, wireframe: true })
 );
 
 // puts the floor along the x-axis
 floor.rotation.x -= Math.PI / 2;
 scene.add(floor);
 
-box.position.y += 10;
-
-scene.add(light, box, createHemisphereLight());
-
 // Render Loop
-let lastXPosition = 100;
-let lastYPosition = 100;
-let changeX = 1;
-let changeY = 1;
+const changeXYPosition = (obj, shape) => {
+  obj.changeX = obj.x - obj.lastXPosition;
+  obj.changeY = obj.y - obj.lastYPosition;
 
-const changeYXPosition = (faceObj, shape) => {
-  changeX = faceObj.x - lastXPosition;
-  changeY = faceObj.y - lastYPosition;
+  shape.position.x += obj.changeX * 0.2;
+  shape.position.y += -(obj.changeY * 0.2);
 
-  shape.position.x += changeX * 0.2;
-  shape.position.y += -(changeY * 0.2);
-  camera.lastXPosition = faceObj.x;
-  lastYPosition = faceObj.y;
+  obj.lastXPosition = obj.x;
+  obj.lastYPosition = obj.y;
+};
+
+const changeHeadPosition = (obj, shape, body) => {
+  obj.changeX = obj.x - body.lastXPosition;
+  // obj.changeY = obj.y - body.lastYPosition;
+
+  shape.position.x += obj.changeX * 0.2;
+  // shape.position.y += -(obj.changeY * 0.2);
+
+  obj.lastXPosition = obj.x;
+  obj.lastYPosition = obj.y;
 };
 
 const render = function(aNose, shape) {
-  changeYXPosition(aNose, shape);
+  // changeYXPosition(aNose, shape);
+  // changeYXPosition(bodyParts.body, body);
 
   // camera.position.z -= 1;
+  // box.position.z -= 1;
 
   //Camera Controls
   // A key strafe left
@@ -151,28 +151,55 @@ const render = function(aNose, shape) {
     camera.rotation.y -= Math.PI * 0.01;
   }
 
-  walls[0].checkCollision(box);
+  // walls[0].checkCollision(box);
 
   renderer.render(scene, camera);
 };
 
-let nose = {};
-let rightEye = {};
-let leftEye = {};
+let bodyParts = {
+  nose: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  // leftShoulder: {},
+  // rightShoulder: {},
+  // leftHip: {},
+  // rightHip: {},
+  body: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+};
+
+//  createBody = () => {
+
+// }
+
+let geometry = new THREE.SphereGeometry(4);
+let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
+let head = new THREE.Mesh(geometry, material);
+// head.position.y += 10;
+head.position.z += 65;
+
+let bodyGeometry = new THREE.BoxGeometry(4, 8);
+let body = new THREE.Mesh(bodyGeometry, material);
+body.position.y += 10;
+body.position.z += 65;
+
+scene.add(light, head, body, createHemisphereLight());
 
 poseNet.on('pose', function(results) {
   let poses = results;
-  loopThroughPoses(poses, nose, rightEye, leftEye);
-  let estimatedNose = {
-    x: nose.x,
-    y: nose.y,
-  };
+  // console.log(bodyParts.body);
+  updatePoses(poses, bodyParts);
 
-  camera.position.x = nose.x;
-  camera.position.y = nose.y;
+  // console.log(bodyParts.nose.x && bodyParts.nose.y);
 
-  if (estimatedNose.x && estimatedNose.y) {
-    render(estimatedNose, box);
+  // if (bodyParts.nose.x && bodyParts.nose.y) {
+  //   console.log(bodyParts.nose, 'NOSE PARTS');
+  //   changeHeadPosition(bodyParts.nose, head);
+
+  //   render(bodyParts.nose, head);
+  // }
+
+  if (bodyParts.body.x && bodyParts.body.y) {
+    changeXYPosition(bodyParts.body, body);
+    changeXYPosition(bodyParts.nose, head);
+    render(bodyParts.body, body);
   }
 });
 
