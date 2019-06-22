@@ -13,9 +13,9 @@ let keyboard = {};
 
 let player = { height: 1.8, speed: -0.5 };
 
-let walls = []
-let newWalls = []
-let cameraSpeed = 1
+let walls = [];
+let newWalls = [];
+let cameraSpeed = 1;
 
 let video = document.createElement('video');
 let vidDiv = document.getElementById('video');
@@ -38,7 +38,7 @@ navigator.mediaDevices
 
 let options = {
   flipHorizontal: true,
-  minConfidence: .5,
+  minConfidence: 0.5,
 };
 
 let poseNet = ml5.poseNet(video, options, modelReady);
@@ -57,45 +57,44 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-
-function createWalls  (num) {
-  let distance = 50
-  console.log(distance, 'BEFORE FOR LOOP')
+function createWalls(num) {
+  let distance = 50;
+  console.log(distance, 'BEFORE FOR LOOP');
   for (let i = 0; i < num; i++) {
-    let number = Math.floor(Math.random() * 20) + 1
-    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
-    let newWall = new SingleHole(number)
-    walls.push(newWall)
+    let number = Math.floor(Math.random() * 20) + 1;
+    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+    let newWall = new SingleHole(number);
+    walls.push(newWall);
     walls[i].fetchWall().forEach(piece => {
-      piece.position.z += distance
-      scene.add(piece)
-      console.log(piece.position.z, 'POSITION Z')
-      });
-      distance += 100
+      piece.position.z += distance;
+      scene.add(piece);
+      console.log(piece.position.z, 'POSITION Z');
+    });
+    distance += 100;
   }
-  newWalls = walls
-  console.log(distance)
+  newWalls = walls;
+  console.log(distance);
 }
-createWalls(10)
+createWalls(10);
 
-function moreWalls ( num ) {
+function moreWalls(num) {
   for (let i = 0; i < num; i++) {
-    let number = Math.floor(Math.random() * 20) + 1
-    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
-    let newWall = new SingleHole(number)
-    walls.push(newWall)
+    let number = Math.floor(Math.random() * 20) + 1;
+    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+    let newWall = new SingleHole(number);
+    walls.push(newWall);
     walls[i].fetchWall().forEach(piece => {
-      piece.position.z += 1000
-      scene.add(piece)
-      console.log(piece.position.z, 'POSITION Z')
-      });
+      piece.position.z += 1000;
+      scene.add(piece);
+      console.log(piece.position.z, 'POSITION Z');
+    });
   }
-  cameraSpeed += .2
+  cameraSpeed += 0.2;
 }
 
 // camera.position.y += 20
 camera.position.set(0, 10, 0);
-camera.rotation.y = Math.PI
+camera.rotation.y = Math.PI;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -116,29 +115,28 @@ function createHemisphereLight() {
 
 // creates floor planes
 
-// let drawnFloor 
-let floor
-let startFloor = 500
+// let drawnFloor
+let floor;
+let startFloor = 500;
 
 function createFloor() {
-let floorLength = 1000
-floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(50, floorLength, 100, 100),
-  // wireframe tests for plane geometry which side is the right side
-  new THREE.MeshBasicMaterial({ color: 0x38761d, wireframe: true })
-);
-// floor.position.z += currentFloor
-floor.position.z += startFloor
-floor.rotation.x -= Math.PI / 2;
+  let floorLength = 1000;
+  floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, floorLength, 100, 100),
+    // wireframe tests for plane geometry which side is the right side
+    new THREE.MeshBasicMaterial({ color: 0x38761d, wireframe: true })
+  );
+  // floor.position.z += currentFloor
+  floor.position.z += startFloor;
+  floor.rotation.x -= Math.PI / 2;
 
-scene.add(floor);
-startFloor += floorLength
-// console.log(floor)
+  scene.add(floor);
+  startFloor += floorLength;
+  // console.log(floor)
 }
-createFloor()
+createFloor();
 
 // puts the floor along the x-axis
-
 
 // Render Loop
 const changeXYPosition = (obj, shape) => {
@@ -147,70 +145,69 @@ const changeXYPosition = (obj, shape) => {
 
   shape.position.x += obj.changeX * 0.2;
   shape.position.y += -(obj.changeY * 0.2);
-
-// Render Loop
-let lastXPosition = 100;
-let lastYPosition = 100;
-let changeX = 1;
-let changeY = 1;
-
-const changeYXPosition = (faceObj, shape) => {
-  changeX = faceObj.x - lastXPosition;
-  changeY = faceObj.y - lastYPosition;
-
-  shape.position.x += changeX * 0.2;
-  shape.position.y += -(changeY * 0.2);
-  // camera.lastXPosition = faceObj.x;
-  lastYPosition = faceObj.y;
+  obj.lastXPosition = obj.x;
+  obj.lastYPosition = obj.y;
 };
+// Render Loop
+// let lastXPosition = 100;
+// let lastYPosition = 100;
+// let changeX = 1;
+// let changeY = 1;
+
+// const changeYXPosition = (faceObj, shape) => {
+//   changeX = faceObj.x - lastXPosition;
+//   changeY = faceObj.y - lastYPosition;
+
+//   shape.position.x += changeX * 0.2;
+//   shape.position.y += -(changeY * 0.2);
+//   // camera.lastXPosition = faceObj.x;
+//   lastYPosition = faceObj.y;
+// };
 
 // let light = new THREE.DirectionalLight(0xffffff, 5.0)
 
 // light.position.set(10, 10, 10)
-  //collision 301
-//   obj.lastXPosition = obj.x;
-//   obj.lastYPosition = obj.y;
+//collision 301
+
 // };
 
-// const changeHeadPosition = (obj, shape, body) => {
-//   obj.changeX = obj.x - body.lastXPosition;
-//   // obj.changeY = obj.y - body.lastYPosition;
+const changeHeadPosition = (obj, shape, body) => {
+  obj.changeX = obj.x - body.lastXPosition;
+  // obj.changeY = obj.y - body.lastYPosition;
 
-//   shape.position.x += obj.changeX * 0.2;
-//   // shape.position.y += -(obj.changeY * 0.2);
+  shape.position.x += obj.changeX * 0.2;
+  // shape.position.y += -(obj.changeY * 0.2);
 
-//   obj.lastXPosition = obj.x;
-//   obj.lastYPosition = obj.y;
-// };
+  obj.lastXPosition = obj.x;
+  obj.lastYPosition = obj.y;
+};
 
 // const render = function(aNose, shape) {
-  // changeYXPosition(aNose, shape);
-  // changeYXPosition(bodyParts.body, body);
+// changeYXPosition(aNose, shape);
+// changeYXPosition(bodyParts.body, body);
 
-  // camera.position.z -= 1;
-  // box.position.z -= 1;
+// camera.position.z -= 1;
+// box.position.z -= 1;
 
 // scene.add(light)
 
-let counter = 0
+let counter = 0;
 const render = function() {
-  requestAnimationFrame( render )
+  requestAnimationFrame(render);
   // if (counter === 0) {
   //   console.log(floor)
   //   counter++
   // }
-  camera.position.z += cameraSpeed;
-  box.position.z += cameraSpeed;
+  // camera.position.z += cameraSpeed;
+  // head.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
-
-  if (camera.position.z > startFloor - 800){  
-    console.log(camera.position.z , startFloor - 800, 'IF STATEMENT')
-    createFloor()
-    moreWalls(10)
-    
+  if (camera.position.z > startFloor - 800) {
+    console.log(camera.position.z, startFloor - 800, 'IF STATEMENT');
+    createFloor();
+    moreWalls(10);
   }
-  
+
   if (keyboard[65]) {
     camera.position.x -=
       Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
@@ -251,7 +248,6 @@ const render = function() {
 
   renderer.render(scene, camera);
 };
-render()
 
 let bodyParts = {
   nose: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
@@ -288,7 +284,7 @@ poseNet.on('pose', function(results) {
 
   // if (bodyParts.nose.x && bodyParts.nose.y) {
   //   console.log(bodyParts.nose, 'NOSE PARTS');
-  //   changeHeadPosition(bodyParts.nose, head);
+  //   changeHeadPosition(bodyParts.nose, head, bodyParts.body);
 
   //   render(bodyParts.nose, head);
   // }
@@ -305,11 +301,11 @@ function modelReady() {
 }
 
 window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  camera.aspect = window.innerWidth / window.innerHeight
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
 
-  camera.updateProjectionMatrix()
-})
+  camera.updateProjectionMatrix();
+});
 
 //Solid wall for test
 // let wallGeometry = new THREE.BoxGeometry(50, 50);
