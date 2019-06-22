@@ -4,7 +4,8 @@ const holeWidth = 10;
 const wallDimension = 50;
 
 export default class SingleHole {
-  constructor(holeLocation = 0, holeHeight = 20) {
+  // hole location range -20 to 20
+  constructor(holeLocation = 0, holeHeight = 20, ) {
     //left side
 
     let col1Geometry = new THREE.BoxGeometry(

@@ -8,42 +8,46 @@ import SingleHole from './Walls/singleHole';
 let keyboard = {};
 
 //Manage walls
-const singleHole = new SingleHole();
-let walls = [singleHole];
+// const singleHole = new SingleHole();
+// let walls = [singleHole];
 
 let player = { height: 1.8, speed: -0.5 };
 
-let video = document.createElement('video');
-let vidDiv = document.getElementById('video');
+let walls = []
+let newWalls = []
+let cameraSpeed = 1
 
-video.setAttribute('width', 200);
-video.setAttribute('height', 200);
-video.autoplay = true;
+// let video = document.createElement('video');
+// let vidDiv = document.getElementById('video');
+
+// video.setAttribute('width', 200);
+// video.setAttribute('height', 200);
+// video.autoplay = true;
 // vidDiv.appendChild(video);
 
 // get the users webcam stream to render in the video
-navigator.mediaDevices
-  .getUserMedia({ video: true, audio: false })
-  .then(function(stream) {
-    video.srcObject = stream;
-    // video.hiddend();
-  })
-  .catch(function(err) {
-    console.log('An error occurred! ' + err);
-  });
+// navigator.mediaDevices
+//   .getUserMedia({ video: true, audio: false })
+//   .then(function(stream) {
+//     video.srcObject = stream;
+//     // video.hiddend();
+//   })
+//   .catch(function(err) {
+//     console.log('An error occurred! ' + err);
+//   });
 
-let options = {
-  flipHorizontal: true,
-  minConfidence: 0.5,
-};
+// let options = {
+//   flipHorizontal: true,
+//   minConfidence: .5,
+// };
 
-let poseNet = ml5.poseNet(video, options, modelReady);
+// let poseNet = ml5.poseNet(video, options, modelReady);
 
 //three.js code
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf0f0f0);
 
-singleHole.fetchWall().forEach(piece => scene.add(piece));
+// singleHole.fetchWall().forEach(piece => scene.add(piece));
 
 // Create a basic perspective camera
 const camera = new THREE.PerspectiveCamera(
@@ -53,7 +57,45 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.set(0, 10, 100);
+
+function createWalls  (num) {
+  let distance = 50
+  console.log(distance, 'BEFORE FOR LOOP')
+  for (let i = 0; i < num; i++) {
+    let number = Math.floor(Math.random() * 20) + 1
+    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
+    let newWall = new SingleHole(number)
+    walls.push(newWall)
+    walls[i].fetchWall().forEach(piece => {
+      piece.position.z += distance
+      scene.add(piece)
+      console.log(piece.position.z, 'POSITION Z')
+      });
+      distance += 100
+  }
+  newWalls = walls
+  console.log(distance)
+}
+createWalls(10)
+
+function moreWalls ( num ) {
+  for (let i = 0; i < num; i++) {
+    let number = Math.floor(Math.random() * 20) + 1
+    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
+    let newWall = new SingleHole(number)
+    walls.push(newWall)
+    walls[i].fetchWall().forEach(piece => {
+      piece.position.z += 1000
+      scene.add(piece)
+      console.log(piece.position.z, 'POSITION Z')
+      });
+  }
+  cameraSpeed += .2
+}
+
+// camera.position.y += 20
+camera.position.set(0, 10, 0);
+camera.rotation.y = Math.PI
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -63,58 +105,83 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
 
-let geometry = new THREE.BoxGeometry(8, 8);
+// let geometry = new THREE.BoxGeometry(8, 8);
 
-let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
+// let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
 
-let box = new THREE.Mesh(geometry, material);
+// let box = new THREE.Mesh(geometry, material);
 // let halfMouthObj = new THREE.Mesh( halfMouth, material );
 
-let light = new THREE.PointLight(0xffff00);
-light.position.set(-10, 0, 10);
+// let light = new THREE.PointLight(0xffff00);
+// light.position.set(-10, 0, 10);
 
-function createHemisphereLight() {
-  return new THREE.HemisphereLight(0x303f9f, 0x000000, 1);
-}
+// function createHemisphereLight() {
+//   return new THREE.HemisphereLight(0x303f9f, 0x000000, 1);
 
-// creates floor plane
-let floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 100, 100),
+// creates floor planes
+
+// let drawnFloor 
+let floor
+let startFloor = 500
+
+function createFloor() {
+let floorLength = 1000
+floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(50, floorLength, 100, 100),
   // wireframe tests for plane geometry which side is the right side
   new THREE.MeshBasicMaterial({ color: 0x883333, wireframe: true })
 );
+// floor.position.z += currentFloor
+floor.position.z += startFloor
+floor.rotation.x -= Math.PI / 2;
+
+scene.add(floor);
+startFloor += floorLength
+// console.log(floor)
+}
+createFloor()
 
 // puts the floor along the x-axis
-floor.rotation.x -= Math.PI / 2;
-scene.add(floor);
 
-box.position.y += 10;
 
-scene.add(light, box, createHemisphereLight());
+// box.position.y += 10;
+
+// scene.add(light, box, createHemisphereLight());
 
 // Render Loop
-let lastXPosition = 100;
-let lastYPosition = 100;
-let changeX = 1;
-let changeY = 1;
+// let lastXPosition = 100;
+// let lastYPosition = 100;
+// let changeX = 1;
+// let changeY = 1;
 
-const changeYXPosition = (faceObj, shape) => {
-  changeX = faceObj.x - lastXPosition;
-  changeY = faceObj.y - lastYPosition;
+// const changeYXPosition = (faceObj, shape) => {
+//   changeX = faceObj.x - lastXPosition;
+//   changeY = faceObj.y - lastYPosition;
 
-  shape.position.x += changeX * 0.2;
-  shape.position.y += -(changeY * 0.2);
-  camera.lastXPosition = faceObj.x;
-  lastYPosition = faceObj.y;
-};
+//   shape.position.x += changeX * 0.2;
+//   shape.position.y += -(changeY * 0.2);
+//   // camera.lastXPosition = faceObj.x;
+//   lastYPosition = faceObj.y;
+// };
 
-const render = function(aNose, shape) {
-  changeYXPosition(aNose, shape);
+let counter = 0
+const render = function() {
+  requestAnimationFrame( render )
+  // if (counter === 0) {
+  //   console.log(floor)
+  //   counter++
+  // }
+  camera.position.z += cameraSpeed;
+  // console.log(floor.geometry.parameters.height)
 
-  // camera.position.z -= 1;
 
-  //Camera Controls
-  // A key strafe left
+  if (camera.position.z > startFloor - 800){  
+    console.log(camera.position.z , startFloor - 800, 'IF STATEMENT')
+    createFloor()
+    moreWalls(10)
+    
+  }
+  
   if (keyboard[65]) {
     camera.position.x -=
       Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
@@ -151,44 +218,42 @@ const render = function(aNose, shape) {
     camera.rotation.y -= Math.PI * 0.01;
   }
 
-  walls[0].checkCollision(box);
+  // walls[0].checkCollision(box);
 
   renderer.render(scene, camera);
 };
+render()
 
-let nose = {};
-let rightEye = {};
-let leftEye = {};
+// let nose = {};
+// let rightEye = {};
+// let leftEye = {};
 
-poseNet.on('pose', function(results) {
-  let poses = results;
-  loopThroughPoses(poses, nose, rightEye, leftEye);
-  let estimatedNose = {
-    x: nose.x,
-    y: nose.y,
-  };
+// poseNet.on('pose', function(results) {
+//   let poses = results;
+//   loopThroughPoses(poses, nose, rightEye, leftEye);
+//   let estimatedNose = {
+//     x: nose.x,
+//     y: nose.y,
+//   };
 
-  camera.position.x = nose.x;
-  camera.position.y = nose.y;
+//   camera.position.x = nose.x;
+//   camera.position.y = nose.y;
 
-  if (estimatedNose.x && estimatedNose.y) {
-    render(estimatedNose, box);
-  }
-});
+//   if (estimatedNose.x && estimatedNose.y) {
+//     render(estimatedNose, box);
+//   }
+// });
 
-function modelReady() {
-  console.log('model Loaded');
-}
+// function modelReady() {
+//   console.log('model Loaded');
+// }
 
-window.addEventListener('resize', onWindowResize, false);
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  camera.aspect = window.innerWidth / window.innerHeight
 
-function onWindowResize() {
-  camera.aspect = window.innerWidth / 2 / (window.innerHeight / 2);
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);
-  //  video.setAttribute('width', window.innerWidth/2);
-  //  video.setAttribute('height', window.innerWidth/2);
-}
+  camera.updateProjectionMatrix()
+})
 
 //Solid wall for test
 // let wallGeometry = new THREE.BoxGeometry(50, 50);
