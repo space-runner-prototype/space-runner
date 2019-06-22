@@ -148,28 +148,6 @@ const changeXYPosition = (obj, shape) => {
   obj.lastXPosition = obj.x;
   obj.lastYPosition = obj.y;
 };
-// Render Loop
-// let lastXPosition = 100;
-// let lastYPosition = 100;
-// let changeX = 1;
-// let changeY = 1;
-
-// const changeYXPosition = (faceObj, shape) => {
-//   changeX = faceObj.x - lastXPosition;
-//   changeY = faceObj.y - lastYPosition;
-
-//   shape.position.x += changeX * 0.2;
-//   shape.position.y += -(changeY * 0.2);
-//   // camera.lastXPosition = faceObj.x;
-//   lastYPosition = faceObj.y;
-// };
-
-// let light = new THREE.DirectionalLight(0xffffff, 5.0)
-
-// light.position.set(10, 10, 10)
-//collision 301
-
-// };
 
 const changeHeadPosition = (obj, shape, body) => {
   obj.changeX = obj.x - body.lastXPosition;
@@ -181,15 +159,6 @@ const changeHeadPosition = (obj, shape, body) => {
   obj.lastXPosition = obj.x;
   obj.lastYPosition = obj.y;
 };
-
-// const render = function(aNose, shape) {
-// changeYXPosition(aNose, shape);
-// changeYXPosition(bodyParts.body, body);
-
-// camera.position.z -= 1;
-// box.position.z -= 1;
-
-// scene.add(light)
 
 let counter = 0;
 const render = function() {
@@ -251,7 +220,14 @@ const render = function() {
 
 let bodyParts = {
   nose: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
-  // leftShoulder: {},
+  leftShoulder: {
+    lastXPosition: 100,
+    lastYPosition: 100,
+    changeX: 1,
+    changeY: 1,
+  },
+  leftElbow: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  leftWrist: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
   // rightShoulder: {},
   // leftHip: {},
   // rightHip: {},
@@ -273,6 +249,23 @@ let body = new THREE.Mesh(bodyGeometry, material);
 body.position.y += 10;
 body.position.z += 65;
 
+//left arm test
+let bones = [];
+const leftShoulder = new THREE.Bone();
+const leftElbow = new THREE.Bone();
+const leftWrist = new THREE.Bone();
+
+leftShoulder.add(leftElbow);
+leftElbow.add(leftWrist);
+
+bones.push(leftShoulder, leftElbow, leftWrist);
+
+leftShoulder.position.z += 65;
+leftElbow.position.z += 65;
+leftWrist.position.z += 65;
+
+const leftArm = new THREE.Skeleton(bones);
+
 scene.add(light, head, body, createHemisphereLight());
 
 poseNet.on('pose', function(results) {
@@ -291,7 +284,7 @@ poseNet.on('pose', function(results) {
 
   if (bodyParts.body.x && bodyParts.body.y) {
     changeXYPosition(bodyParts.body, body);
-    changeXYPosition(bodyParts.nose, head);
+    // changeXYPosition(bodyParts.nose, head);
     render(bodyParts.body, body);
   }
 });
@@ -335,3 +328,16 @@ function keyUp(event) {
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+
+document
+  .getElementById('play_button')
+  .addEventListener('click', function(event) {
+    event.preventDefault();
+    playGame();
+  });
+
+function playGame() {
+  // event.preventDefault()
+  document.getElementById('menu').style.display = 'none';
+  render();
+}

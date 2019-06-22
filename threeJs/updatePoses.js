@@ -3,6 +3,11 @@ function loopThroughPoses(poses, bodyParts) {
     let noseData = pose.pose.keypoints[0];
     let leftShoulderData = pose.pose.keypoints[5];
     let rightShoulderData = pose.pose.keypoints[6];
+
+    //Left arm test
+    let leftElbowData = pose.pose.keypoints[7];
+    let leftWristData = pose.pose.keypoints[9];
+
     let leftHipData = pose.pose.keypoints[11];
     let rightHipData = pose.pose.keypoints[12];
 
@@ -22,14 +27,22 @@ function loopThroughPoses(poses, bodyParts) {
       bodyParts.nose.y = noseData.position.y;
     }
 
+    //Left arm test
+    if (leftElbowData.score > 0.2 && leftWristData.score > 0.2) {
+      bodyParts.leftElbow.x = leftElbowData.position.x;
+      bodyParts.leftElbow.y = leftElbowData.position.y;
+      bodyParts.leftWrist.y = leftWristData.position.x;
+      bodyParts.leftWrist.y = leftWristData.position.y;
+    }
+
     if (
       leftShoulderData.score > 0.2 &&
       rightShoulderData.score > 0.2 &&
       leftHipData.score > 0.2 &&
       rightHipData.score > 0.2
     ) {
-      // bodyParts.leftShoulder.x = leftShoulderData.position.x;
-      // bodyParts.leftShoulder.y = leftShoulderData.position.y;
+      bodyParts.leftShoulder.x = leftShoulderData.position.x;
+      bodyParts.leftShoulder.y = leftShoulderData.position.y;
       // bodyParts.rightShoulder.x = rightShoulderData.position.x;
       // bodyParts.rightShoulder.y = rightShoulderData.position.y;
 
