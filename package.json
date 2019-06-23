@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-client-watch": "webpack -w",
     "start": "node server",
-    "start-dev": "npm run build-client-watch & nodemon server.js",
+    "dev": "npm start & webpack-dev-server --progress --colors",
+    "build": "webpack -w",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

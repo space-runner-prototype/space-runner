@@ -1,9 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path')
-
-
-const PORT =  8080
+const PORT =  8081
 
 
 // you'll of course want static middleware so your browser can request things like your 'bundle.js'
@@ -17,6 +15,11 @@ const PORT =  8080
 app.get('*', function (req, res, next) {
   res.sendFile(path.join(__dirname,'./index.html'))
 });
+
+
+// app.get('/camtest', function (req, res, next) {
+//     res.sendFile(path.join(__dirname, './camtest/camtest.html'))
+// })
 
 const startListening = () => {
     // start listening (and create a 'server' object representing our server)

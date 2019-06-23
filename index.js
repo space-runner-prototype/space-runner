@@ -3,19 +3,22 @@ import * as ml5 from 'ml5';
 import * as THREE from 'three';
 import updatePoses from './threeJs/updatePoses';
 import SingleHole from './Walls/singleHole';
+
 //new compile?
 
 let keyboard = {};
+let modelLoaded = false
 
 //Manage walls
 // const singleHole = new SingleHole();
 // let walls = [singleHole];
 
 let player = { height: 1.8, speed: -0.5 };
-  
+
 let wallsPath = [];
 let wallsPool = [];
 let cameraSpeed = .5;
+let cameraNoSpeed = 0
 
 let video = document.createElement('video');
 let vidDiv = document.getElementById('video');
@@ -23,7 +26,7 @@ let vidDiv = document.getElementById('video');
 video.setAttribute('width', 200);
 video.setAttribute('height', 200);
 video.autoplay = true;
-// vidDiv.appendChild(video);
+// vidDiv.appendChild(video)
 
 // get the users webcam stream to render in the video
 navigator.mediaDevices
@@ -45,6 +48,7 @@ let poseNet = ml5.poseNet(video, options, modelReady);
 
 //three.js code
 const scene = new THREE.Scene();
+// scene.overrideMaterial = new THREE.MeshToonMaterial()
 scene.background = new THREE.Color(0xf0f0f0);
 
 // singleHole.fetchWall().forEach(piece => scene.add(piece));
@@ -79,11 +83,12 @@ function createWalls(num) {
     let number = Math.floor(Math.random() * 20) + 1;
     number *= Math.floor(Math.random()* 2) === 1 ? 1 : -1;
     let newWall = new SingleHole(number);
- 
+    
     wallsPool.push(newWall);
  
     wallsPool[i].fetchWall().forEach(piece => {
       piece.position.z = lastWallDistance;
+      
       scene.add(piece);
     });
     lastWallDistance += 100;
@@ -142,8 +147,25 @@ function createFloor() {
   scene.add(floor);
   startFloor += floorLength;
   // console.log(floor)
+  // floor.checkCollision(camera)
 }
 createFloor();
+
+// MENU
+// let menuMaterial = new THREE.MeshBasicMaterial({ wireframe:true})
+// let menuPlane = new THREE.PlaneGeometry(20, 20)
+// let menu = new THREE.Mesh(menuPlane, menuMaterial)
+// menu.position.z = 20
+// menu.position.y += 10
+// scene.add(menu)
+
+// let domMenu = document.createElement('div')
+// let cssMenu = CSS3DObject(domMenu)
+
+// cssMenu.position = menu.position
+// cssMenu.rotation = menu.rotation
+
+// cssScene.add(cssMenu)
 
 // puts the floor along the x-axis
 
@@ -221,6 +243,10 @@ const init = function() {
   // Right Arrow rotate right
   if (keyboard[39]) {
     camera.rotation.y -= Math.PI * 0.01;
+  }
+
+  if (keyboard[32]) {
+    [cameraSpeed, cameraNoSpeed] = [cameraNoSpeed, cameraSpeed]
   }
 
   // walls[0].checkCollision(box);
@@ -303,6 +329,7 @@ poseNet.on('pose', function(results) {
 });
 
 function modelReady() {
+  modelLoaded = true
   console.log('model Loaded');
 }
 
@@ -343,14 +370,47 @@ window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
 
 document
-  .getElementById('play_button')
+  .getElementById('play-button')
   .addEventListener('click', function(event) {
+    // if (modelLoaded) {
     event.preventDefault();
-    playGame();
+    document.getElementById('menu').style.display = 'none';
+    init()
+    // }
   });
 
-function playGame() {
-  // event.preventDefault()
-  document.getElementById('menu').style.display = 'none';
-  init();
-}
+// document.getElementById('camera-test').addEventListener('click', function(event){
+//   event.preventDefault()
+
+// })
+
+
+var loader = new THREE.FontLoader();
+
+loader.load( '/fonts/droid_sans_bold.typeface.json', function ( font ) {
+
+	const text = new THREE.TextGeometry( 'Hello three.js!', {
+		font: font,
+		size: 80,
+		height: 5,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 10,
+		bevelSize: 8,
+		bevelOffset: 0,
+		bevelSegments: 5
+  } );
+  
+  const textMaterial = new THREE.MeshLambertMaterial(
+    {color: 0x2299E8, specular: 0x000000}
+  )
+  
+  const name = new THREE.Mesh(text, textMaterial)
+  scene.add(name)
+
+} );
+
+
+
+
+
