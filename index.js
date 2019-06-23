@@ -1,22 +1,21 @@
 /* eslint-disable complexity */
 import * as ml5 from 'ml5';
 import * as THREE from 'three';
-import loopThroughPoses from './threeJs/nose';
+import updatePoses from './threeJs/updatePoses';
 import SingleHole from './Walls/singleHole';
 //new compile?
 
 let keyboard = {};
-// let target = []
 
 //Manage walls
 // const singleHole = new SingleHole();
 // let walls = [singleHole];
 
 let player = { height: 1.8, speed: -0.5 };
-
-let walls = []
-let newWalls = []
-let cameraSpeed = 1
+  
+let wallsPath = [];
+let wallsPool = [];
+let cameraSpeed = .5;
 
 let video = document.createElement('video');
 let vidDiv = document.getElementById('video');
@@ -39,10 +38,10 @@ navigator.mediaDevices
 
 let options = {
   flipHorizontal: true,
-  minConfidence: .5,
+  minConfidence: 0.5,
 };
 
-// let poseNet = ml5.poseNet(video, options, modelReady);
+let poseNet = ml5.poseNet(video, options, modelReady);
 
 //three.js code
 const scene = new THREE.Scene();
@@ -58,87 +57,53 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-// let loader = new THREE.FontLoader()
-
-// let startButton = loader.load( './fonts/droid_sans_bold.typeface.json', function ( font ) {
-
-// 	var geometry = new THREE.TextGeometry( 'START', {
-// 		font: font,
-// 		size: 80,
-// 		height: 5,
-// 		curveSegments: 12,
-// 		bevelEnabled: true,
-// 		bevelThickness: 10,
-// 		bevelSize: 8,
-// 		bevelOffset: 0,
-// 		bevelSegments: 5
-// 	} );
-// } );
-
-
-// loading screen
-// let loadingScreen = {
-//   scene: new THREE.Scene(),
-//   camera: new THREE.PerspectiveCamera(75,
-//     window.innerWidth / window.innerHeight,
-//     0.1,
-//     1000),
-//   startButton: new THREE.Mesh(
-//     new THREE.BoxGeometry(0.5, 0.5, 0.5),
-//     new THREE.MeshBasicMaterial({color: 0x444fff})
-//   )
-// }
-// loadingScreen.startButton.playGame = false
-
-// console.log("START BUTTON", loadingScreen.startButton)
-// let PLAY_GAME = false
-
-
-// loadingScreen.startButton.position.set(0, 0, 5)
-// loadingScreen.camera.lookAt(loadingScreen.startButton.position)
-// loadingScreen.scene.add(loadingScreen.startButton)
-
-// target.push(loadingScreen.startButton)
-// console.log(target)
-
-function createWalls  (num) {
-  let distance = 50
-  console.log(distance, 'BEFORE FOR LOOP')
+function createWalls(num) {
+  let distance = 50;
   for (let i = 0; i < num; i++) {
-    let number = Math.floor(Math.random() * 20) + 1
-    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
-    let newWall = new SingleHole(number)
-    walls.push(newWall)
-    walls[i].fetchWall().forEach(piece => {
-      piece.position.z += distance
-      scene.add(piece)
-      console.log(piece.position.z, 'POSITION Z')
-      });
-      distance += 100
+    let number = Math.floor(Math.random() * 20) + 1;
+    number *= Math.floor(Math.random()* 2) === 1 ? 1 : -1;
+    let newWall = new SingleHole(number);
+    wallsPath.push(newWall);
+    wallsPath[i].fetchWall().forEach(piece => {
+      piece.position.z += distance;
+      scene.add(piece);
+    });
+    distance += 100;
   }
-  newWalls = walls
-  console.log(distance)
-}
-createWalls(10)
-
-function moreWalls ( num ) {
+ }
+ createWalls(10);
+ 
+ function moreWalls(num) {
+  let lastWallDistance = wallsPath[wallsPath.length - 1].col1.position.z + 100;
   for (let i = 0; i < num; i++) {
-    let number = Math.floor(Math.random() * 20) + 1
-    number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1
-    let newWall = new SingleHole(number)
-    walls.push(newWall)
-    walls[i].fetchWall().forEach(piece => {
-      piece.position.z += 1000
-      scene.add(piece)
-      console.log(piece.position.z, 'POSITION Z')
-      });
+    let number = Math.floor(Math.random() * 20) + 1;
+    number *= Math.floor(Math.random()* 2) === 1 ? 1 : -1;
+    let newWall = new SingleHole(number);
+ 
+    wallsPool.push(newWall);
+ 
+    wallsPool[i].fetchWall().forEach(piece => {
+      piece.position.z = lastWallDistance;
+      scene.add(piece);
+    });
+    lastWallDistance += 100;
   }
-  // cameraSpeed += .2
-}
+ 
+  wallsPath.length = 0;
+  wallsPath = [
+    wallsPath[wallsPath.length - 3],
+    wallsPath[wallsPath.length - 2],
+    wallsPath[wallsPath.length - 1],
+    ...wallsPool,
+  ];
+  wallsPool.length = 0;
+ 
+  cameraSpeed += 0.2;
+ }
 
 // camera.position.y += 20
-camera.position.set(0, 10, 0);
-camera.rotation.y = Math.PI
+camera.position.set(0, 10, -15);
+camera.rotation.y = Math.PI;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -148,11 +113,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
 
-let geometry = new THREE.BoxGeometry(8, 8);
-
-let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
-
-let box = new THREE.Mesh(geometry, material);
 // let halfMouthObj = new THREE.Mesh( halfMouth, material );
 
 let light = new THREE.PointLight(0xffff00);
@@ -164,84 +124,69 @@ function createHemisphereLight() {
 
 // creates floor planes
 
-// let drawnFloor 
-let floor
-let startFloor = 500
+// let drawnFloor
+let floor;
+let startFloor = 500;
 
 function createFloor() {
-let floorLength = 1000
-floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(50, floorLength, 100, 100),
-  // wireframe tests for plane geometry which side is the right side
-  new THREE.MeshBasicMaterial({ color: 0x883333, wireframe: true })
-);
-// floor.position.z += currentFloor
-floor.position.z += startFloor
-floor.rotation.x -= Math.PI / 2;
+  let floorLength = 1000;
+  floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, floorLength, 100, 100),
+    // wireframe tests for plane geometry which side is the right side
+    new THREE.MeshBasicMaterial({ color: 0x38761d, wireframe: true })
+  );
+  // floor.position.z += currentFloor
+  floor.position.z += startFloor;
+  floor.rotation.x -= Math.PI / 2;
 
-scene.add(floor);
-startFloor += floorLength
-// console.log(floor)
+  scene.add(floor);
+  startFloor += floorLength;
+  // console.log(floor)
 }
-createFloor()
+createFloor();
 
 // puts the floor along the x-axis
 
-
-box.position.y += 10;
-
-scene.add(light, box, createHemisphereLight());
-
 // Render Loop
-let lastXPosition = 100;
-let lastYPosition = 100;
-let changeX = 1;
-let changeY = 1;
+const changeXYPosition = (obj, shape) => {
+  obj.changeX = obj.x - obj.lastXPosition;
+  obj.changeY = obj.y - obj.lastYPosition;
 
-const changeYXPosition = (faceObj, shape) => {
-  changeX = faceObj.x - lastXPosition;
-  changeY = faceObj.y - lastYPosition;
-
-  shape.position.x += changeX * 0.2;
-  shape.position.y += -(changeY * 0.2);
-  // camera.lastXPosition = faceObj.x;
-  lastYPosition = faceObj.y;
+  shape.position.x -= obj.changeX * 0.2;
+  camera.position.x -= obj.changeX * 0.2;
+  shape.position.y += -(obj.changeY * 0.2);
+  obj.lastXPosition = obj.x;
+  obj.lastYPosition = obj.y;
 };
 
-// let light = new THREE.DirectionalLight(0xffffff, 5.0)
+// const changeHeadPosition = (obj, shape, body) => {
+//   obj.changeX = obj.x - body.lastXPosition;
+//   // obj.changeY = obj.y - body.lastYPosition;
 
-// light.position.set(10, 10, 10)
+//   shape.position.x += obj.changeX * 0.2;
+//   // shape.position.y += -(obj.changeY * 0.2);
 
-// scene.add(light)
+//   obj.lastXPosition = obj.x;
+//   obj.lastYPosition = obj.y;
+// };
 
-let counter = 0
-const render = function() {
-  
-  // if (loadingScreen.startButton.playGame === false) {
-  //   requestAnimationFrame(render)
-
-  //   renderer.render(loadingScreen.scene, loadingScreen.camera)
-  //   return
-  // }
-  // else {
-  requestAnimationFrame( render )
+let counter = 0;
+const init = function() {
+  requestAnimationFrame(init);
   // if (counter === 0) {
   //   console.log(floor)
   //   counter++
   // }
-  // camera.position.z += cameraSpeed;
-  box.position.z += cameraSpeed;
+  camera.position.z += cameraSpeed;
+  head.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
-
-
-  if (camera.position.z > startFloor - 800){  
-    console.log(camera.position.z , startFloor - 800, 'IF STATEMENT')
-    createFloor()
-    moreWalls(10)
-    
+  if (camera.position.z > startFloor - 800) {
+    console.log(camera.position.z, startFloor - 800, 'IF STATEMENT');
+    createFloor();
+    moreWalls(10);
   }
-  
+
   if (keyboard[65]) {
     camera.position.x -=
       Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
@@ -281,40 +226,92 @@ const render = function() {
   // walls[0].checkCollision(box);
 
   renderer.render(scene, camera);
-
 };
-// render()
 
-let nose = {};
-let rightEye = {};
-let leftEye = {};
+let bodyParts = {
+  nose: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  leftShoulder: {
+    lastXPosition: 100,
+    lastYPosition: 100,
+    changeX: 1,
+    changeY: 1,
+  },
+  leftElbow: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  leftWrist: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  // rightShoulder: {},
+  // leftHip: {},
+  // rightHip: {},
+  body: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+};
 
-// poseNet.on('pose', function(results) {
-//   let poses = results;
-//   loopThroughPoses(poses, nose, rightEye, leftEye);
-//   let estimatedNose = {
-//     x: nose.x,
-//     y: nose.y,
-//   };
+//  createBody = () => {
 
-//   camera.position.x = nose.x;
-//   camera.position.y = nose.y;
-
-//   if (estimatedNose.x && estimatedNose.y) {
-//     render(estimatedNose, box);
-//   }
-// });
-
-// function modelReady() {
-//   console.log('model Loaded');
 // }
 
-window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  camera.aspect = window.innerWidth / window.innerHeight
+let geometry = new THREE.SphereGeometry(4);
+let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
+let head = new THREE.Mesh(geometry, material);
 
-  camera.updateProjectionMatrix()
-})
+// head.position.z += 65;
+
+let bodyGeometry = new THREE.BoxGeometry(4, 8);
+let body = new THREE.Mesh(bodyGeometry, material);
+body.position.y += 10;
+
+// body.position.z += 65;
+// head.position.y = body.position.y
+
+//left arm test
+let bones = [];
+const leftShoulder = new THREE.Bone();
+const leftElbow = new THREE.Bone();
+const leftWrist = new THREE.Bone();
+
+leftShoulder.add(leftElbow);
+leftElbow.add(leftWrist);
+
+bones.push(leftShoulder, leftElbow, leftWrist);
+
+leftShoulder.position.z += 65;
+leftElbow.position.z += 65;
+leftWrist.position.z += 65;
+
+const leftArm = new THREE.Skeleton(bones);
+
+scene.add(light, createHemisphereLight());
+// body.rotation.x = Math.PI
+
+poseNet.on('pose', function(results) {
+  let poses = results;
+  // console.log(bodyParts.body);
+  updatePoses(poses, bodyParts);
+
+  // console.log(bodyParts.nose.x && bodyParts.nose.y);
+
+  if (bodyParts.nose.x && bodyParts.nose.y) {
+    // console.log(bodyParts.nose, 'NOSE PARTS');
+    changeXYPosition(bodyParts.nose, head);
+
+    // render(bodyParts.nose, head);
+  }
+
+  // if (bodyParts.body.x && bodyParts.body.y) {
+  //   changeXYPosition(bodyParts.body, body);
+    // changeXYPosition(bodyParts.nose, head);
+    // render(bodyParts.body, body);
+  // }
+});
+
+function modelReady() {
+  console.log('model Loaded');
+}
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+
+  camera.updateProjectionMatrix();
+});
 
 //Solid wall for test
 // let wallGeometry = new THREE.BoxGeometry(50, 50);
@@ -341,41 +338,19 @@ function keyDown(event) {
 function keyUp(event) {
   keyboard[event.keyCode] = false;
 }
-// console.log(loadingScreen.startButton)
-
-
-// console.log(raycaster)
-let mouse = new THREE.Vector2()
-let raycaster = new THREE.Raycaster()
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
 
-document.getElementById("play_button").addEventListener('click', function (event) {
-  event.preventDefault();
-  playGame();
-});
-// window.addEventListener('click', playGame)
-// console.log(window)
-
-
+document
+  .getElementById('play_button')
+  .addEventListener('click', function(event) {
+    event.preventDefault();
+    playGame();
+  });
 
 function playGame() {
   // event.preventDefault()
-  document.getElementById("menu").style.display = "none";
-  render()
-  // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-  
-  // raycaster.setFromCamera(mouse, camera)
-  // // console.log(raycaster, 'raycaster')
-  // // console.log(scene.children , 'SCENE.CHILDREN')
-  // let intersects = raycaster.intersectObjects(target)
-  // console.log(intersects)
-  // for (let i = 0; i < intersects.length; i++) {
-    
-  //   intersects[i].object.material.color.set(0xff0000)
-  // }
-  // // console.log(intersects)
-  
+  document.getElementById('menu').style.display = 'none';
+  init();
 }

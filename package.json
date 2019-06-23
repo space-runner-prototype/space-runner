@@ -4,15 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-dev": "webpack -w",
+    "build-client-watch": "webpack -w",
+    "start": "node server",
+    "start-dev": "npm run build-client-watch & nodemon server.js",
+    "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ml5": "^0.1.2",
+    "express": "^4.17.1",
+    "ml5": "^0.1.3",
+    "nodemon": "^1.19.1",
     "three": "^0.98.0",
-    "webpack": "^4.25.1"
+    "webpack": "^4.35.0"
   },
   "devDependencies": {
     "webpack-cli": "^3.3.4"
