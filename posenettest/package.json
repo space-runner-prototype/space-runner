@@ -1,0 +1,17 @@
+{
+  "name": "posenettest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "posenettest.js",
+  "scripts": {
+    "build": "webpack -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ml5": "^0.3.1",
+    "three": "^0.105.2",
+    "webpack": "^4.35.0"
+  }
+}

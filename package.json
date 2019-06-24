@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server",
-    "dev": "npm start & webpack-dev-server --progress --colors",
+    "dev": "npm start && webpack-dev-server",
     "build": "webpack -w",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
