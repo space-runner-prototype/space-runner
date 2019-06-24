@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable complexity */
 import * as ml5 from 'ml5';
 import * as THREE from 'three';
@@ -11,10 +12,10 @@ let keyboard = {};
 // const singleHole = new SingleHole();
 // let walls = [singleHole];
 
-let player = { height: 1.8, speed: -0.5 };
+let player = { height: 1.8, speed: -3 };
 
-let walls = [];
-let newWalls = [];
+let wallsPath = [];
+let wallsPool = [];
 let cameraSpeed = 1;
 
 let video = document.createElement('video');
@@ -37,17 +38,53 @@ navigator.mediaDevices
   });
 
 let options = {
-  flipHorizontal: true,
+  flipHorizontal: false,
   minConfidence: 0.5,
 };
 
 let poseNet = ml5.poseNet(video, options, modelReady);
 
+const keyboardMovement = keyPress => {
+  if (keyPress === keyboard[65]) {
+    camera.position.x -=
+      Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
+    camera.position.z -=
+      Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+  }
+
+  //D key move right
+  if (keyPress === keyboard[68]) {
+    camera.position.x +=
+      Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
+    camera.position.z +=
+      Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+  }
+
+  //W key move forwad
+  if (keyPress === keyboard[87]) {
+    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+    camera.position.z += Math.cos(camera.rotation.y) * player.speed;
+  }
+
+  //S Key move backwards
+  if (keyPress === keyboard[83]) {
+    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+    camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
+  }
+
+  // Left Arrow rotate left
+  if (keyPress === keyboard[37]) {
+    camera.rotation.y += Math.PI * 0.01;
+  }
+  // Right Arrow rotate right
+  if (keyPress === keyboard[39]) {
+    camera.rotation.y -= Math.PI * 0.01;
+  }
+};
+
 //three.js code
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf0f0f0);
-
-// singleHole.fetchWall().forEach(piece => scene.add(piece));
 
 // Create a basic perspective camera
 const camera = new THREE.PerspectiveCamera(
@@ -58,53 +95,52 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 function createWalls(num) {
-  let distance = 50;
-  console.log(distance, 'BEFORE FOR LOOP');
+  let distance = 0;
   for (let i = 0; i < num; i++) {
     let number = Math.floor(Math.random() * 20) + 1;
     number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
     let newWall = new SingleHole(number);
-    walls.push(newWall);
-    walls[i].fetchWall().forEach(piece => {
+    wallsPath.push(newWall);
+    wallsPath[i].fetchWall().forEach(piece => {
       piece.position.z += distance;
       scene.add(piece);
-      console.log(piece.position.z, 'POSITION Z');
     });
     distance += 100;
   }
-  newWalls = walls;
-  console.log(distance);
 }
 createWalls(10);
 
 function moreWalls(num) {
+  let lastWallDistance = wallsPath[wallsPath.length - 1].col1.position.z + 100;
   for (let i = 0; i < num; i++) {
     let number = Math.floor(Math.random() * 20) + 1;
     number *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
     let newWall = new SingleHole(number);
-    walls.push(newWall);
-    walls[i].fetchWall().forEach(piece => {
-      piece.position.z += 1000;
+
+    wallsPool.push(newWall);
+
+    wallsPool[i].fetchWall().forEach(piece => {
+      piece.position.z = lastWallDistance;
       scene.add(piece);
-      console.log(piece.position.z, 'POSITION Z');
     });
+    lastWallDistance += 100;
   }
+
+  wallsPath = [...wallsPath, ...wallsPool];
+  wallsPool.length = 0;
+  console.log(wallsPath, 'WALLSPATH');
+
   cameraSpeed += 0.2;
 }
 
 // camera.position.y += 20
-camera.position.set(0, 10, 0);
+camera.position.set(0, 10, -35);
 camera.rotation.y = Math.PI;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-
 renderer.setClearColor('#2E2B40');
-
 renderer.setSize(window.innerWidth, window.innerHeight);
-
 document.body.appendChild(renderer.domElement);
-
-// let halfMouthObj = new THREE.Mesh( halfMouth, material );
 
 let light = new THREE.PointLight(0xffff00);
 light.position.set(-10, 0, 10);
@@ -115,7 +151,6 @@ function createHemisphereLight() {
 
 // creates floor planes
 
-// let drawnFloor
 let floor;
 let startFloor = 500;
 
@@ -126,17 +161,13 @@ function createFloor() {
     // wireframe tests for plane geometry which side is the right side
     new THREE.MeshBasicMaterial({ color: 0x38761d, wireframe: true })
   );
-  // floor.position.z += currentFloor
   floor.position.z += startFloor;
   floor.rotation.x -= Math.PI / 2;
 
   scene.add(floor);
   startFloor += floorLength;
-  // console.log(floor)
 }
 createFloor();
-
-// puts the floor along the x-axis
 
 // Render Loop
 const changeXYPosition = (obj, shape) => {
@@ -148,157 +179,192 @@ const changeXYPosition = (obj, shape) => {
   obj.lastXPosition = obj.x;
   obj.lastYPosition = obj.y;
 };
-// Render Loop
-// let lastXPosition = 100;
-// let lastYPosition = 100;
-// let changeX = 1;
-// let changeY = 1;
 
-// const changeYXPosition = (faceObj, shape) => {
-//   changeX = faceObj.x - lastXPosition;
-//   changeY = faceObj.y - lastYPosition;
-
-//   shape.position.x += changeX * 0.2;
-//   shape.position.y += -(changeY * 0.2);
-//   // camera.lastXPosition = faceObj.x;
-//   lastYPosition = faceObj.y;
-// };
-
-// let light = new THREE.DirectionalLight(0xffffff, 5.0)
-
-// light.position.set(10, 10, 10)
-//collision 301
-
-// };
-
-const changeHeadPosition = (obj, shape, body) => {
-  obj.changeX = obj.x - body.lastXPosition;
-  // obj.changeY = obj.y - body.lastYPosition;
+const changeJointPosition = (obj, shape, line, vertex) => {
+  obj.changeX = obj.x - obj.lastXPosition;
+  obj.changeY = obj.y - obj.lastYPosition;
 
   shape.position.x += obj.changeX * 0.2;
-  // shape.position.y += -(obj.changeY * 0.2);
+  shape.position.y += -(obj.changeY * 0.2);
+
+  line.geometry.vertices[vertex].x = shape.position.x;
+  line.geometry.vertices[vertex].y = shape.position.y;
+  line.geometry.verticesNeedUpdate = true;
 
   obj.lastXPosition = obj.x;
   obj.lastYPosition = obj.y;
 };
 
-// const render = function(aNose, shape) {
-// changeYXPosition(aNose, shape);
-// changeYXPosition(bodyParts.body, body);
+let wallCount = 1;
+let level = 0;
 
-// camera.position.z -= 1;
-// box.position.z -= 1;
+const generatePath = () => {
+  createFloor();
+  moreWalls(10);
+};
 
-// scene.add(light)
+const nextLevel = () => {
+  level++;
+  wallCount = 0;
+  wallsPath = wallsPath.slice(10);
+};
 
-let counter = 0;
 const render = function() {
   requestAnimationFrame(render);
-  // if (counter === 0) {
-  //   console.log(floor)
-  //   counter++
-  // }
+
+  //Check Collision
+
+  if (camera.position.z <= 0) {
+    console.log('checking initial collision');
+
+    wallsPath[0].checkCollision(head);
+  }
+  if (camera.position.z + 10 >= wallCount * 100 + level * 1000) {
+    console.log('checking collision');
+    if (wallCount === 10) {
+      wallsPath[0].checkCollision(head);
+    } else {
+      wallsPath[wallCount].checkCollision(head);
+    }
+  }
+
   // camera.position.z += cameraSpeed;
   // head.position.z += cameraSpeed;
-  // console.log(floor.geometry.parameters.height)
 
+  //For testing: locks head to middle
+  // head.position.z = camera.position.z;
+
+  // console.log(
+  //   camera.position.z,
+  //   'Z',
+  //   camera.position.x,
+  //   'X',
+  //   wallCount,
+  //   'WALLCOUNT'
+  // );
+
+  //Makes more walls when close to the end of current path
   if (camera.position.z > startFloor - 800) {
-    console.log(camera.position.z, startFloor - 800, 'IF STATEMENT');
-    createFloor();
-    moreWalls(10);
+    generatePath();
   }
 
-  if (keyboard[65]) {
-    camera.position.x -=
-      Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
-    camera.position.z -=
-      Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+  //Keeps count of current wall position
+  if (camera.position.z / 100 - level * 10 > wallCount) {
+    wallCount++;
+    console.log(wallCount, 'INCREASED WALL COUNT');
   }
 
-  //D key move right
-  if (keyboard[68]) {
-    camera.position.x +=
-      Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
-    camera.position.z +=
-      Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+  //Updates current level and normalizes wall position
+  if (camera.position.z > 1000 * (level + 1)) {
+    console.log('NEXT LEVEL!!!');
+    nextLevel();
   }
-
-  //W key move forwad
-  if (keyboard[87]) {
-    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z += Math.cos(camera.rotation.y) * player.speed;
-  }
-
-  //S Key move backwards
-  if (keyboard[83]) {
-    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
-  }
-
-  // Left Arrow rotate left
-  if (keyboard[37]) {
-    camera.rotation.y += Math.PI * 0.01;
-  }
-  // Right Arrow rotate right
-  if (keyboard[39]) {
-    camera.rotation.y -= Math.PI * 0.01;
-  }
-
-  // walls[0].checkCollision(box);
 
   renderer.render(scene, camera);
 };
 
 let bodyParts = {
   nose: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
-  // leftShoulder: {},
+
+  //Left Arm
+  leftShoulder: {
+    lastXPosition: 100,
+    lastYPosition: 100,
+    changeX: 1,
+    changeY: 1,
+  },
+  leftElbow: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
+  leftWrist: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
   // rightShoulder: {},
   // leftHip: {},
   // rightHip: {},
   body: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
 };
 
-//  createBody = () => {
-
-// }
-
 let geometry = new THREE.SphereGeometry(4);
 let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
 let head = new THREE.Mesh(geometry, material);
-// head.position.y += 10;
-head.position.z += 65;
+head.position.y += 10;
+// head.position.z += 65;
 
 let bodyGeometry = new THREE.BoxGeometry(4, 8);
 let body = new THREE.Mesh(bodyGeometry, material);
 body.position.y += 10;
-body.position.z += 65;
+// body.position.z += 65;
 
-scene.add(light, head, body, createHemisphereLight());
+const leftArmGeometry = new THREE.SphereGeometry(0.5);
+const leftShoulder = new THREE.Mesh(leftArmGeometry, material);
+// leftShoulder.position.z += 65;
+leftShoulder.position.y += 13;
+leftShoulder.position.x += 8;
+
+const leftElbow = new THREE.Mesh(leftArmGeometry, material);
+// leftShoulder.position.z += 65;
+leftElbow.position.y += 13;
+leftElbow.position.x += 10;
+
+const leftWrist = new THREE.Mesh(leftArmGeometry, material);
+// leftShoulder.position.z += 65;
+leftWrist.position.y += 13;
+leftWrist.position.x += 12;
+
+var leftArm = new THREE.Geometry();
+leftArm.vertices.push(
+  new THREE.Vector3(leftShoulder.position.x, leftShoulder.position.y, 0)
+);
+leftArm.vertices.push(
+  new THREE.Vector3(leftElbow.position.x, leftElbow.position.y, 0)
+);
+leftArm.vertices.push(
+  new THREE.Vector3(leftWrist.position.x, leftWrist.position.y, 0)
+);
+
+const limbMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+const leftArmBone = new THREE.Line(leftArm, limbMaterial);
+
+scene.add(leftArmBone);
+
+function modelReady() {
+  console.log('model Loaded');
+}
+
+scene.add(
+  light,
+  head,
+  body,
+  leftShoulder,
+  leftElbow,
+  leftWrist,
+  createHemisphereLight()
+);
 
 poseNet.on('pose', function(results) {
   let poses = results;
   // console.log(bodyParts.body);
   updatePoses(poses, bodyParts);
 
-  // console.log(bodyParts.nose.x && bodyParts.nose.y);
-
-  // if (bodyParts.nose.x && bodyParts.nose.y) {
-  //   console.log(bodyParts.nose, 'NOSE PARTS');
-  //   changeHeadPosition(bodyParts.nose, head, bodyParts.body);
-
-  //   render(bodyParts.nose, head);
+  // Update left arm
+  // if (
+  //   bodyParts.leftShoulder.x &&
+  //   bodyParts.leftShoulder.y &&
+  //   bodyParts.leftElbow.x &&
+  //   bodyParts.leftElbow.y &&
+  //   bodyParts.leftWrist.x &&
+  //   bodyParts.leftWrist.y
+  // ) {
+  //   changeJointPosition(bodyParts.leftShoulder, leftShoulder, leftArmBone, 0);
+  //   changeJointPosition(bodyParts.leftElbow, leftElbow, leftArmBone, 1);
+  //   changeJointPosition(bodyParts.leftWrist, leftWrist, leftArmBone, 2);
   // }
 
-  if (bodyParts.body.x && bodyParts.body.y) {
-    changeXYPosition(bodyParts.body, body);
+  if (bodyParts.nose.x && bodyParts.nose.y) {
     changeXYPosition(bodyParts.nose, head);
-    render(bodyParts.body, body);
   }
-});
 
-function modelReady() {
-  console.log('model Loaded');
-}
+  // if (bodyParts.body.x && bodyParts.body.y) {
+  //   changeXYPosition(bodyParts.body, body);
+  // }
+});
 
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -327,6 +393,7 @@ window.addEventListener('resize', () => {
 
 function keyDown(event) {
   keyboard[event.keyCode] = true;
+  keyboardMovement(keyboard[event.keyCode]);
 }
 
 function keyUp(event) {
@@ -335,3 +402,18 @@ function keyUp(event) {
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+
+// document
+//   .getElementById('play_button')
+//   .addEventListener('click', function(event) {
+//     event.preventDefault();
+//     playGame();
+//   });
+
+// function playGame() {
+//   // event.preventDefault()
+//   document.getElementById('menu').style.display = 'none';
+//   render();
+// }
+
+render();
