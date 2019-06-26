@@ -6,13 +6,13 @@ import SingleHole from './Walls/singleHole';
 
 let keyboard = {};
 let modelLoaded = false
-let statsLoaded = false
+// let statsLoaded = false
 
 let player = { height: 1.8, speed: -0.5 };
 
 let wallsPath = [];
 let wallsPool = [];
-let cameraSpeed = .5;
+let cameraSpeed = .25;
 let cameraNoSpeed = 0
 
 let video = document.createElement('video');
@@ -112,7 +112,6 @@ const renderer = new THREE.WebGLRenderer({ antialias: true ,});
 // alpha: true
 renderer.setClearColor(0x000000, 0);
 
-
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
@@ -167,6 +166,7 @@ const changeXYPosition = (obj, shape) => {
 // };
 
 let wallCount = 1;
+let wallsPassed = 0
 let level = 0;
 
 const generatePath = () => {
@@ -198,7 +198,7 @@ const init = function() {
 
 
   camera.position.z += cameraSpeed;
-  // head.position.z += cameraSpeed;
+  head.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
   // distance.innerHTML = camera.position.z
@@ -211,7 +211,7 @@ const init = function() {
   //Keeps count of current wall position
   if (camera.position.z / 100 - level * 10 > wallCount) {
     wallCount++;
-    console.log(wallCount, 'INCREASED WALL COUNT');
+    wallsPassed++
   }
 
   //Updates current level and normalizes wall position
@@ -281,7 +281,7 @@ let bodyParts = {
   body: { lastXPosition: 100, lastYPosition: 100, changeX: 1, changeY: 1 },
 };
 
-let geometry = new THREE.SphereGeometry(4);
+let geometry = new THREE.SphereGeometry(4.5);
 let material = new THREE.MeshPhongMaterial({ color: '0x2194ce' });
 let head = new THREE.Mesh(geometry, material);
 head.position.y += 10;
@@ -309,7 +309,7 @@ body.position.y += 10;
 
 // const leftArm = new THREE.Skeleton(bones);
 
-scene.add(light);
+scene.add(light, head);
 // body.rotation.x = Math.PI
 
 poseNet.on('pose', function(results) {
@@ -322,7 +322,7 @@ poseNet.on('pose', function(results) {
   }
 
   // if (bodyParts.body.x && bodyParts.body.y) {
-    // changeXYPosition(bodyParts.nose, head);
+  //   changeXYPosition(bodyParts.body, body);
   // }
 });
 
@@ -363,7 +363,10 @@ document.body.onkeyup = function(e) {
       document.getElementById('menu').style.display = 'none';
       init()
       }
+    }
 
+    if (keyboard[27]) {
+      window.location = './index.html'
     }
 
     if(keyboard[18]) {

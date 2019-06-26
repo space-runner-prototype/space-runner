@@ -8,7 +8,7 @@ export default class SingleHole {
   constructor(holeLocation = 0, holeHeight = 20) {
     //right side
     holeWidth = Math.ceil(Math.random()*5) + 10
-    console.log(holeWidth)
+    // console.log(holeWidth)
     let col1Geometry = new THREE.BoxGeometry(
       (wallDimension - holeWidth) / 2 + holeLocation,
       wallDimension
@@ -77,10 +77,12 @@ export default class SingleHole {
       wallDimension / 2 > boxLocation
     ) {
       console.log('HITTTT2', this.col2.position.x);
+      
     }
 
     if (this.holeHeight < box.position.y) {
       console.log('HITTTT3', this.col3.position.x);
+
     }
   }
 }
@@ -95,5 +97,3 @@ function getRandomColor() {
     return color;
   }
 }
-
-// export default MiddleHole

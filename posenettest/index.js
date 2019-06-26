@@ -10,7 +10,7 @@ let player = { height: 1.8, speed: -3 };
 let cameraSpeed = 0.5;
 
 let video = document.createElement('video');
-let vidDiv = document.getElementById('video');
+// let vidDiv = document.getElementById('video');
 
 video.setAttribute('width', 200);
 video.setAttribute('height', 200);
@@ -33,8 +33,6 @@ let options = {
 };
 
 let poseNet = ml5.poseNet(video, options, modelReady);
-
-const keyboardMovement = keyPress => {};
 
 //three.js code
 const scene = new THREE.Scene();
