@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 
-const holeWidth = 10;
+let holeWidth = 10
 const wallDimension = 50;
 
 export default class SingleHole {
   // hole location range -20 to 20
-  constructor(holeLocation = 0, holeHeight = 20, ) {
-    //left side
-
+  constructor(holeLocation = 0, holeHeight = 20) {
+    //right side
+    holeWidth = Math.ceil(Math.random()*5) + 10
+    console.log(holeWidth)
     let col1Geometry = new THREE.BoxGeometry(
       (wallDimension - holeWidth) / 2 + holeLocation,
       wallDimension
@@ -19,7 +20,7 @@ export default class SingleHole {
     });
     this.col1 = new THREE.Mesh(col1Geometry, col1Material);
 
-    //right side
+    //left side
     let col2Geometry = new THREE.BoxGeometry(
       (wallDimension - holeWidth) / 2 - holeLocation,
       wallDimension
@@ -61,25 +62,25 @@ export default class SingleHole {
   }
 
   checkCollision(box) {
+    // console.log(this.col1.position, 'COL1', this.col2.position, 'cOL2');
+    let boxLocation = box.position.x;
+
     if (
-      this.col1.position.x + 10 >
-      box.position.x - box.geometry.parameters.width / 2
+      wallDimension / 2 + 2 * this.col1.position.x > boxLocation &&
+      -wallDimension / 2 < boxLocation
     ) {
       console.log('HITTTT1', this.col1.position.x);
     }
 
     if (
-      this.col2.position.x - 10 <
-      box.position.x + box.geometry.parameters.width / 2
+      wallDimension / 2 - 2 * this.col2.position.x > boxLocation &&
+      wallDimension / 2 > boxLocation
     ) {
       console.log('HITTTT2', this.col2.position.x);
     }
 
-    if (
-      this.col3.position.y - 10 <
-      box.position.y + box.geometry.parameters.width / 2
-    ) {
-      console.log('HITTTT3', this.col2.position.x);
+    if (this.holeHeight < box.position.y) {
+      console.log('HITTTT3', this.col3.position.x);
     }
   }
 }
@@ -91,9 +92,8 @@ function getRandomColor() {
     color += letters[Math.floor(Math.random() * 16)];
   }
   if (color !== '#ffffff') {
-  return color
+    return color;
   }
 }
-
 
 // export default MiddleHole

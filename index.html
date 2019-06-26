@@ -1,65 +1,219 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Posetris</title>
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Space Runner</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel=stylesheet href="main.css"/>
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
+<body>
 
-      #menu {
-        position: absolute;
-        width: 200px;
-        height: 250px;
+<script src="js.1/Three.js"></script>
+<script src="js.1/Detector.js"></script>
 
-        top: 50%;
-        left: 50%;
-        margin: -125px 0 0 -100px;
+<script src="js.1/OrbitControls.js"></script>
+<script src="js.1/THREEx.FullScreen.js"></script>
+<script src="js.1/THREEx.WindowResize.js"></script>
 
-        text-align: center;
+<!-- load fonts -->
 
-        border: 3px solid #fff;
-        border-radius: 15px;
+<script src="fonts/droid_sans_regular.typeface.js"></script>
+<script src="fonts/droid_sans_bold.typeface.js"></script>
+<!-- <div id='distance'></div> -->
+<div id="menu" style="position: absolute; left:0px; top:0px"></div>
+<script>
 
-        background-color: #e36b23;
-        box-shadow: 2px 10px 5px #888;
-      }
+// MAIN
 
-      #menu button {
-        width: 80px;
-        height: 25px;
+// standard global letiables
+let container, scene, camera, renderer, controls, stats;
 
-        background-color: #c44032;
+// custom global letiables
+let target = []
+let projector, mouse = { x: 0, y: 0 };
 
-        border: 3px solid #fff;
-        border-radius: 5px;
+init();
+animate();
 
-        font-size: 14px;
-        font-weight: bold;
-        color: #fff;
-      }
-    </style>
+// FUNCTIONS
 
-    <link rel="stylesheet" href="main.css" />
-  </head>
-  <body>
-    <div id="menu">
-      <h1>POSETRIS</h1>
-      <button id="play_button">Play Game</button>
-    </div>
-    <div id="video"></div>
-    <div id="canvas">
-      <!-- <div id='play-game'></div> -->
-    <!-- </div> -->
 
-    <!-- <div id="video"></div>
-    <div id="canvas"></div> -->
+function init() 
+{
+	// SCENE
+	scene = new THREE.Scene();
+	// CAMERA
+	let SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	let VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(0,150,400);
+	camera.lookAt(scene.position);	
+	// RENDERER
+	if ( Detector.webgl )
+		renderer = new THREE.WebGLRenderer( {antialias:true} );
+	else
+		renderer = new THREE.CanvasRenderer(); 
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	container = document.getElementById( 'menu' );
+	container.appendChild( renderer.domElement );
+	// EVENTS
+	THREEx.WindowResize(renderer, camera);
+	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	// CONTROLS
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-    <script src="bundle.js"></script>
-    <!-- <script src="../posetris/demo.js"></script> -->
-  </body>
+	// LIGHT
+	let light = new THREE.PointLight(0xffffff);
+	light.position.set(0,250,0);
+	scene.add(light);
+
+	
+	// add 3D text
+
+	//Font color
+	let materialFront = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	
+	//Font outline color
+	let materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	let materialArray = [ materialFront, materialSide ];
+  let titleGeom = new THREE.TextGeometry( "+ SPACE RUNNER +", 
+	{
+		size: 30, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let escKeyGeom = new THREE.TextGeometry( "ESC to go back to menu", 
+	{
+		size: 7, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let mKeyGeom = new THREE.TextGeometry( "m for full screen", 
+	{
+		size: 7, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let statKeyGeom = new THREE.TextGeometry( "Hit F12 -> console tab -> to see how many times you got hit!", 
+	{
+		size: 7, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+
+	let captionGeom = new THREE.TextGeometry( "Hit Space to Start, to Run, & Float!", 
+	{
+		size: 10, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let captionGeom2 = new THREE.TextGeometry( "Hit Enter for Camera Test", 
+	{
+		size: 10, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let captionGeom3 = new THREE.TextGeometry( "Hit Alt for Scoreboard", 
+	{
+		size: 10, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+
+	
+	let textMaterial = new THREE.MeshFaceMaterial(materialArray);
+	let textMesh = new THREE.Mesh(titleGeom, textMaterial );
+	let escKeyMesh = new THREE.Mesh(escKeyGeom, textMaterial)
+	let mKeyMesh = new THREE.Mesh(mKeyGeom, textMaterial)
+	let statKeyMesh = new THREE.Mesh(statKeyGeom, textMaterial)
+	let captionMesh = new THREE.Mesh(captionGeom, textMaterial)
+	let captionMesh2 = new THREE.Mesh(captionGeom2, textMaterial)
+	let captionMesh3 = new THREE.Mesh(captionGeom3, textMaterial)
+	
+	titleGeom.computeBoundingBox()
+	let textWidth = titleGeom.boundingBox.max.x - titleGeom.boundingBox.min.x;
+	
+	textMesh.position.set( -0.5 * textWidth, 50, 100 );
+	escKeyMesh.position.set( -0.4 * textWidth, 90, 25 );
+	mKeyMesh.position.set( 0.22 * textWidth, 90, 25 );	
+	statKeyMesh.position.set( -0.27 * textWidth, 0, 25 );	
+	captionMesh.position.set( -0.3 * textWidth, -50, 25 );
+	captionMesh2.position.set( -0.3 * textWidth, -70, 25 );
+	captionMesh3.position.set( -0.3 * textWidth, -90, 25 );
+
+	textMesh.rotation.x = -Math.PI / 4;
+
+	scene.add(textMesh);
+	scene.add(escKeyMesh)
+	scene.add(mKeyMesh)
+	scene.add(statKeyMesh)
+	scene.add(captionMesh)
+	scene.add(captionMesh2)
+	scene.add(captionMesh3)
+	target.push(textMesh)
+
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+}
+
+function animate() 
+{
+    requestAnimationFrame( animate );
+	render();	
+	update()	
+}
+
+function update()
+{
+	controls.update();
+}
+
+
+function onDocumentMouseDown( event ) 
+{
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+	
+	// find intersections
+
+	// create a Ray with origin at the mouse position
+	//   and direction into the scene (camera direction)
+	let vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+	// projector.unprojectVector( vector, camera );
+	let ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+	// create an array containing all objects in the scene with which the ray intersects
+	let intersects = ray.intersectObjects( target );
+	
+	// if there is one (or more) intersections
+	if ( intersects.length > 0 )
+	{
+		// change the color of the closest face.
+		intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+		intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+	}
+
+}
+function render() 
+{
+	renderer.render( scene, camera );
+}
+
+</script>
+      <script src="bundle.js"></script>
+</body>
 </html>
