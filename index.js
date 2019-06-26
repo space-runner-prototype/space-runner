@@ -373,8 +373,3 @@ document.body.onkeyup = function(e) {
       window.confirm(`Level: ${level} Wall Count: ${wallCount + level * 10} Distance: ${Math.floor(camera.position.z) + 35}`)
     }
 }
-
-
-
-
-
