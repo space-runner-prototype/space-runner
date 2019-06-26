@@ -1,6 +1,6 @@
 #To Run Application
 
-FIRST PERSON ENDLESS RUNNER w/ Machine Learning
+FIRST PERSON ENDLESS RUNNER w/ webcam motion capture Machine Learning
 
 1. cd space-runner
 2. npm i
