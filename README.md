@@ -2,7 +2,7 @@
 
 FIRST PERSON ENDLESS RUNNER w/ webcam motion capture Machine Learning
 
-Tech Stack\
+Tech Stack
 
 three.js - design\
 poseNet from ml5.js - real time motion capture
