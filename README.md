@@ -8,8 +8,8 @@ three.js - design\
 poseNet from ml5.js - real time motion capture
 
 Integrated three.js stack for designing endless runner with random wall generation.
-Manually calculated algorithms for collision through console.log
-Needs work on potentially implementing a collision feedback mechanism.
+Manually implemented & calculated algorithms for collision.
+Needs work on potentially implementing a user friendly collision feedback mechanism.
 
 1. cd space-runner
 2. npm i
