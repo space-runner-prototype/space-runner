@@ -11,7 +11,8 @@ Integrated three.js stack for designing endless runner with random wall generati
 Manually implemented & calculated algorithms for collision detection.
 Needs to work on potentially implementing a user friendly collision feedback mechanism.
 
-1. cd space-runner
-2. npm i
-3. npm run build
-4. copy path of the index html onto your browser
+1. git clone https://github.com/space-runner-prototype/space-runner.git in terminal
+2. cd space-runner
+3. npm i
+4. npm run build
+5. copy path of the index html onto your browser
