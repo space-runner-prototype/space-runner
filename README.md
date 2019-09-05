@@ -6,7 +6,7 @@ FIRST PERSON ENDLESS RUNNER prototype w/ webcam motion capture Machine Learning
 
 ![space-runner-gameplay](./space-runner-gameplay.png)
 
-Tech Stack
+## Tech Stack
 
 three.js - design
 poseNet from ml5.js - real time motion capture
