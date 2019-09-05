@@ -2,9 +2,9 @@
 
 FIRST PERSON ENDLESS RUNNER prototype w/ webcam motion capture Machine Learning
 
-![space-runner-homescreen](./space-runner.png)
+![space-runner-homescreen](space-runner.png)
 
-![space-runner-gameplay](./space-runner-gameplay.png)
+![space-runner-gameplay](space-runner-gameplay.png)
 
 Tech Stack
 
