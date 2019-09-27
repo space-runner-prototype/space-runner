@@ -1,4 +1,4 @@
-FIRST PERSON ENDLESS RUNNER prototype w/ webcam motion capture Machine Learning
+**FIRST PERSON ENDLESS RUNNER prototype w/ webcam motion capture Machine Learning**
 
 ![space-runner-homescreen](./space-runner.png)
 
