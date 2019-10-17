@@ -8,7 +8,7 @@
 
 three.js - design
 poseNet from ml5.js - real time motion capture
-tenserflow
+TensorFlow
 
 Integrated three.js stack for designing endless runner with random wall generation.
 Manually implemented & calculated algorithms for collision detection.
