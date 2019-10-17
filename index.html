@@ -28,14 +28,14 @@ let container, scene, camera, renderer, controls, stats;
 
 let target = []
 let projector, mouse = { x: 0, y: 0 };
-  
+
 init();
 animate();
 
 // FUNCTIONS
 
 
-function init() 
+function init()
 {
 	// SCENE
 	scene = new THREE.Scene();
@@ -45,12 +45,12 @@ function init()
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
 	camera.position.set(0,150,400);
-	camera.lookAt(scene.position);	
+	camera.lookAt(scene.position);
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
 	else
-		renderer = new THREE.CanvasRenderer(); 
+		renderer = new THREE.CanvasRenderer();
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	container = document.getElementById( 'menu' );
 	container.appendChild( renderer.domElement );
@@ -65,16 +65,16 @@ function init()
 	light.position.set(0,250,0);
 	scene.add(light);
 
-	
+
 	// add 3D text
 
 	//Font color
 	let materialFront = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-	
+
 	//Font outline color
 	let materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
 	let materialArray = [ materialFront, materialSide ];
-	let titleGeom = new THREE.TextGeometry( "+ SPACE RUNNER +", 
+	let titleGeom = new THREE.TextGeometry( "+ SPACE RUNNER +",
 	{
 		size: 30, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -82,7 +82,7 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
-	let escKeyGeom = new THREE.TextGeometry( "ESC to go back to menu", 
+	let escKeyGeom = new THREE.TextGeometry( "ESC to go back to menu",
 	{
 		size: 7, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -90,7 +90,7 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
-	let mKeyGeom = new THREE.TextGeometry( "m for full screen", 
+	let mKeyGeom = new THREE.TextGeometry( "m for full screen",
 	{
 		size: 7, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -98,16 +98,7 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
-	let statKeyGeom = new THREE.TextGeometry( "Hit F12 -> console tab -> to see how many times you got hit!", 
-	{
-		size: 7, height: 4, curveSegments: 3,
-		font: "droid sans", weight: "bold", style: "normal",
-		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
-		material: 0, extrudeMaterial: 1
-	});
-
-
-	let captionGeom = new THREE.TextGeometry( "Hit Space to Start, to Run, & Float!", 
+	let subKeyGeom = new THREE.TextGeometry( "To see how many times you got hit!",
 	{
 		size: 10, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -115,7 +106,7 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
-	let captionGeom2 = new THREE.TextGeometry( "Hit Enter for Camera Test", 
+	let subKeyGeom2 = new THREE.TextGeometry( "Hit CMD + OPTION + J for Macs",
 	{
 		size: 10, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -123,7 +114,7 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
-	let captionGeom3 = new THREE.TextGeometry( "Hit Alt for Scoreboard", 
+	let subKeyGeom3 = new THREE.TextGeometry( "Hit CMD + OPTION + J for Windows",
 	{
 		size: 10, height: 4, curveSegments: 3,
 		font: "droid sans", weight: "bold", style: "normal",
@@ -132,33 +123,64 @@ function init()
 	});
 
 
-	
+	let captionGeom = new THREE.TextGeometry( "Hit Space to Start, to Run, & Float!",
+	{
+		size: 8, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let captionGeom2 = new THREE.TextGeometry( "Hit Enter for Camera Test",
+	{
+		size: 8, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+	let captionGeom3 = new THREE.TextGeometry( "Hit Alt for Scoreboard",
+	{
+		size: 8, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
+
+
 	let textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	let textMesh = new THREE.Mesh(titleGeom, textMaterial );
 	let escKeyMesh = new THREE.Mesh(escKeyGeom, textMaterial)
 	let mKeyMesh = new THREE.Mesh(mKeyGeom, textMaterial)
-	let statKeyMesh = new THREE.Mesh(statKeyGeom, textMaterial)
+	let subKeyMesh = new THREE.Mesh(subKeyGeom, textMaterial)
+	let subKeyMesh2 = new THREE.Mesh(subKeyGeom2, textMaterial)
+	let subKeyMesh3 = new THREE.Mesh(subKeyGeom3, textMaterial)
 	let captionMesh = new THREE.Mesh(captionGeom, textMaterial)
 	let captionMesh2 = new THREE.Mesh(captionGeom2, textMaterial)
 	let captionMesh3 = new THREE.Mesh(captionGeom3, textMaterial)
-	
+
 	titleGeom.computeBoundingBox()
 	let textWidth = titleGeom.boundingBox.max.x - titleGeom.boundingBox.min.x;
-	
+
 	textMesh.position.set( -0.5 * textWidth, 50, 100 );
 	escKeyMesh.position.set( -0.4 * textWidth, 90, 25 );
-	mKeyMesh.position.set( 0.22 * textWidth, 90, 25 );	
-	statKeyMesh.position.set( -0.27 * textWidth, 0, 25 );	
-	captionMesh.position.set( -0.3 * textWidth, -50, 25 );
-	captionMesh2.position.set( -0.3 * textWidth, -70, 25 );
-	captionMesh3.position.set( -0.3 * textWidth, -90, 25 );
+	mKeyMesh.position.set( 0.22 * textWidth, 90, 25 );
+	subKeyMesh.position.set( -0.5 * textWidth, -10, 25 );
+	subKeyMesh2.position.set( -0.5 * textWidth, -50, 25 );
+	subKeyMesh3.position.set( -0.5 * textWidth, -70, 25 );
+	captionMesh.position.set( 0.2 * textWidth, -10, 25 );
+	captionMesh2.position.set( 0.2 * textWidth, -30, 25 );
+	captionMesh3.position.set( 0.2 * textWidth, -50, 25 );
 
 	textMesh.rotation.x = -Math.PI / 4;
 
 	scene.add(textMesh);
 	scene.add(escKeyMesh)
 	scene.add(mKeyMesh)
-	scene.add(statKeyMesh)
+	scene.add(subKeyMesh)
+	scene.add(subKeyMesh2)
+	scene.add(subKeyMesh3)
 	scene.add(captionMesh)
 	scene.add(captionMesh2)
 	scene.add(captionMesh3)
@@ -167,11 +189,11 @@ function init()
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 }
 
-function animate() 
+function animate()
 {
     requestAnimationFrame( animate );
-	render();	
-	update()	
+	render();
+	update()
 }
 
 function update()
@@ -180,12 +202,12 @@ function update()
 }
 
 
-function onDocumentMouseDown( event ) 
+function onDocumentMouseDown( event )
 {
-	
+
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	
+
 	// find intersections
 
 	// create a Ray with origin at the mouse position
@@ -196,17 +218,17 @@ function onDocumentMouseDown( event )
 
 	// create an array containing all objects in the scene with which the ray intersects
 	let intersects = ray.intersectObjects( target );
-	
+
 	// if there is one (or more) intersections
 	if ( intersects.length > 0 )
 	{
 		// change the color of the closest face.
-		intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+		intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 );
 		intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
 	}
 
 }
-function render() 
+function render()
 {
 	renderer.render( scene, camera );
 }
