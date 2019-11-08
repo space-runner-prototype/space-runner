@@ -1,4 +1,4 @@
-## FIRST PERSON ENDLESS RUNNER prototype w/ webcam motion capture Machine Learning
+## FIRST PERSON ENDLESS RUNNER prototype with webcam motion capture using Machine Learning
 
 ![space-runner-homescreen](./space-runner.png)
 
@@ -11,7 +11,7 @@ poseNet from ml5.js - real time motion capture
 TensorFlow
 
 Integrated three.js stack for designing endless runner with random wall generation.
-Manually implemented & calculated algorithms for collision detection.
+Manually implemented and calculated algorithms for collision detection.
 Needs to work on potentially implementing a user friendly collision feedback mechanism.
 
 ## To Run Application

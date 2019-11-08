@@ -122,6 +122,14 @@ function init()
 		material: 0, extrudeMaterial: 1
 	});
 
+	let subKeyGeom4 = new THREE.TextGeometry( "& click on console tab",
+	{
+		size: 10, height: 4, curveSegments: 3,
+		font: "droid sans", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+
 
 	let captionGeom = new THREE.TextGeometry( "Hit Space to Start, to Run, & Float!",
 	{
@@ -156,6 +164,7 @@ function init()
 	let subKeyMesh = new THREE.Mesh(subKeyGeom, textMaterial)
 	let subKeyMesh2 = new THREE.Mesh(subKeyGeom2, textMaterial)
 	let subKeyMesh3 = new THREE.Mesh(subKeyGeom3, textMaterial)
+	let subKeyMesh4 = new THREE.Mesh(subKeyGeom4, textMaterial)
 	let captionMesh = new THREE.Mesh(captionGeom, textMaterial)
 	let captionMesh2 = new THREE.Mesh(captionGeom2, textMaterial)
 	let captionMesh3 = new THREE.Mesh(captionGeom3, textMaterial)
@@ -169,6 +178,7 @@ function init()
 	subKeyMesh.position.set( -0.5 * textWidth, -10, 25 );
 	subKeyMesh2.position.set( -0.5 * textWidth, -50, 25 );
 	subKeyMesh3.position.set( -0.5 * textWidth, -70, 25 );
+	subKeyMesh4.position.set( -0.5 * textWidth, -100, 25 );
 	captionMesh.position.set( 0.2 * textWidth, -10, 25 );
 	captionMesh2.position.set( 0.2 * textWidth, -30, 25 );
 	captionMesh3.position.set( 0.2 * textWidth, -50, 25 );
@@ -181,6 +191,7 @@ function init()
 	scene.add(subKeyMesh)
 	scene.add(subKeyMesh2)
 	scene.add(subKeyMesh3)
+	scene.add(subKeyMesh4)
 	scene.add(captionMesh)
 	scene.add(captionMesh2)
 	scene.add(captionMesh3)
