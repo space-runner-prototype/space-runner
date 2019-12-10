@@ -7,7 +7,9 @@
 ## Tech Stack
 
 three.js - design
+
 poseNet from ml5.js - real time motion capture
+
 TensorFlow
 
 Integrated three.js stack for designing endless runner with random wall generation.
