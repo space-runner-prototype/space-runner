@@ -12,6 +12,8 @@
 
 **TensorFlow.js**
 
+## Approach
+
 Integrated three.js stack for designing endless runner with random wall generation.
 
 Manually implemented and calculated algorithms for collision detection.
