@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server",
     "dev": "npm start && webpack-dev-server",
-    "build": "webpack -w",
+    "start": "npm run open && webpack -w",
+    "open": "open index.html",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
