@@ -5,15 +5,15 @@ import updatePoses from './threeJs/updatePoses';
 import SingleHole from './Walls/singleHole';
 
 let keyboard = {};
-let modelLoaded = false
+let modelLoaded = false;
 // let statsLoaded = false
 
 let player = { height: 1.8, speed: -0.5 };
 
 let wallsPath = [];
 let wallsPool = [];
-let cameraSpeed = .25;
-let cameraNoSpeed = 0
+let cameraSpeed = 0.25;
+let cameraNoSpeed = 0;
 
 let video = document.createElement('video');
 let vidDiv = document.getElementById('video');
@@ -81,7 +81,7 @@ function createWalls(num) {
   }
 }
 createWalls(10);
- 
+
 function moreWalls(num) {
   let lastWallDistance = wallsPath[wallsPath.length - 1].col1.position.z + 100;
   for (let i = 0; i < num; i++) {
@@ -108,14 +108,13 @@ function moreWalls(num) {
 camera.position.set(0, 10, -35);
 camera.rotation.y = Math.PI;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true ,});
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 // alpha: true
 renderer.setClearColor(0x000000, 0);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
-
 
 let light = new THREE.PointLight(0xffffff);
 
@@ -166,7 +165,7 @@ const changeXYPosition = (obj, shape) => {
 // };
 
 let wallCount = 1;
-let wallsPassed = 0
+let wallsPassed = 0;
 let level = 0;
 
 const generatePath = () => {
@@ -196,22 +195,21 @@ const init = function() {
     }
   }
 
-
   camera.position.z += cameraSpeed;
   head.position.z += cameraSpeed;
   // console.log(floor.geometry.parameters.height)
 
   // distance.innerHTML = camera.position.z
 
-   //Makes more walls when close to the end of current path
-   if (camera.position.z > startFloor - 800) {
+  //Makes more walls when close to the end of current path
+  if (camera.position.z > startFloor - 800) {
     generatePath();
   }
 
   //Keeps count of current wall position
   if (camera.position.z / 100 - level * 10 > wallCount) {
     wallCount++;
-    wallsPassed++
+    wallsPassed++;
   }
 
   //Updates current level and normalizes wall position
@@ -257,10 +255,9 @@ const init = function() {
   }
 
   if (keyboard[32]) {
-    [cameraSpeed, cameraNoSpeed] = [cameraNoSpeed, cameraSpeed]
+    [cameraSpeed, cameraNoSpeed] = [cameraNoSpeed, cameraSpeed];
     // statsLoaded = !statsLoaded
-
-}
+  }
 
   renderer.render(scene, camera);
 };
@@ -316,7 +313,6 @@ poseNet.on('pose', function(results) {
   let poses = results;
   updatePoses(poses, bodyParts);
 
-
   if (bodyParts.nose.x && bodyParts.nose.y) {
     changeXYPosition(bodyParts.nose, head);
   }
@@ -327,7 +323,7 @@ poseNet.on('pose', function(results) {
 });
 
 function modelReady() {
-  modelLoaded = true
+  modelLoaded = true;
   console.log('model Loaded');
 }
 
@@ -337,7 +333,6 @@ window.addEventListener('resize', () => {
 
   camera.updateProjectionMatrix();
 });
-
 
 function keyDown(event) {
   keyboard[event.keyCode] = true;
@@ -350,26 +345,26 @@ function keyUp(event) {
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
 
-
-
-
 document.body.onkeyup = function(e) {
-    if (modelLoaded) {
-      if (e.keyCode === 13) {
-        window.location = './camtest/camtest.html'
-      }
+  if (modelLoaded) {
+    if (e.keyCode === 13) {
+      window.location = './camtest/camtest.html';
+    }
 
-      if (e.keyCode === 32) {
+    if (e.keyCode === 32) {
       document.getElementById('menu').style.display = 'none';
-      init()
-      }
+      init();
     }
+  }
 
-    if (keyboard[27]) {
-      window.location = './index.html'
-    }
+  if (keyboard[27]) {
+    window.location = './index.html';
+  }
 
-    if(keyboard[18]) {
-      window.confirm(`Level: ${level} Wall Count: ${wallCount + level * 10} Distance: ${Math.floor(camera.position.z) + 35}`)
-    }
-}
+  if (keyboard[18]) {
+    window.confirm(
+      `Level: ${level} Wall Count: ${wallCount +
+        level * 10} Distance: ${Math.floor(camera.position.z) + 35}`
+    );
+  }
+};

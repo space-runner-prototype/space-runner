@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm start && webpack-dev-server",
-    "start": "npm run open && webpack -w",
+    "start": "webpack -w",
+    "heroku-postbuild": "webpack -p",
     "open": "open index.html",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
