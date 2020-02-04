@@ -21,7 +21,9 @@ app.get('*', function(req, res, next) {
 
 const startListening = () => {
   // start listening (and create a 'server' object representing our server)
-  app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`));
+  app.listen(process.env.PORT || PORT, () =>
+    console.log(`Mixing it up on port ${PORT}`)
+  );
 };
 
 startListening();
