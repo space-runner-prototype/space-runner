@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm start && webpack-dev-server",
-    "start": "webpack -w",
+    "start": "node server.js",
     "heroku-postbuild": "webpack -p",
     "open": "open index.html",
     "start-server": "nodemon server.js",
