@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm start && webpack-dev-server",
     "start": "node server.js",
-    "heroku-postbuild": "webpack -p",
+    "heroku-postbuild": "webpack -w",
     "open": "open index.html",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
