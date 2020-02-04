@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm start && webpack-dev-server",
     "start": "node server.js",
+    "build": "webpack",
     "open": "open index.html",
     "start-server": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
