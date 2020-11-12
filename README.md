@@ -30,5 +30,5 @@ Needs to work on potentially implementing a user friendly collision feedback mec
 
 ## Dev Team
 
-- Ricky Lau ([LinkedIn](https://www.linkedin.com/in/rickylaudev) | [GitHub](https://github.com/rickylaufitness))
+- Ricky Lau ([LinkedIn](https://www.linkedin.com/in/rickylaudev) | [GitHub](https://github.com/erick805))
 - Alexander Mok ([LinkedIn](https://www.linkedin.com/in/mok-alexander/) | [GitHub](https://github.com/MistuhMok))
