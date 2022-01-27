@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "ml5": "^0.3.1",
-    "three": "^0.105.2",
+    "three": "^0.137.0",
     "webpack": "^4.35.0"
   }
 }
