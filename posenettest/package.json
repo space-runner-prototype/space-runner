@@ -12,6 +12,6 @@
   "dependencies": {
     "ml5": "^0.3.1",
     "three": "^0.105.2",
-    "webpack": "^4.35.0"
+    "webpack": "^5.75.0"
   }
 }
